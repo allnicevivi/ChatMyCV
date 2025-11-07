@@ -1,0 +1,12 @@
+[2025-11-06 15:49:02] - [DocProcess_Rte] - [process_file():29 ERROR] name 'file_path' is not defined
+Traceback (most recent call last):
+  File "/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/routes/doc_process_routes.py", line 27, in process_file
+    nodes = doc_processor.run(files)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/services/doc_processor_serv.py", line 56, in run
+    self.store_doc(nodes)
+  File "/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/services/doc_processor_serv.py", line 35, in store_doc
+    file_path=file_path,
+              ^^^^^^^^^
+NameError: name 'file_path' is not defined
+[2025-11-06 15:50:05] - [DocProcessor] - [store_doc():47 INFO] node_cnt_before: 7, node_cnt_after: 7

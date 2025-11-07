@@ -1,0 +1,18 @@
+- app.py
+- models
+    - azure_models.py
+    - openai_models.py
+    - gemini_models.py
+- parsers
+    - docx_parser.py
+    - pdf_parser.py
+- vectordb
+    - chroma_vectordb.py
+- routes
+    - chat_routes.py
+    - uploaded_routes.py
+- services
+    - chat_servicce.py
+    - doc_processor.py
+- component
+    - base.py
