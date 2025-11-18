@@ -20,7 +20,7 @@ Backend
 Install dependencies from `requirements.txt`:
 
 ```bash
-cd /Users/viviliu/Documents/10_Vivi/ChatMyCV
+cd ChatMyCV
 python -m venv .venv
 source .venv/bin/activate  # on macOS / Linux
 pip install -r requirements.txt
@@ -33,7 +33,7 @@ You may also need to set any model/vectorstore credentials in your environment o
 From the project root:
 
 ```bash
-cd /Users/viviliu/Documents/10_Vivi/ChatMyCV
+cd ChatMyCV
 python backend/app.py
 ```
 
@@ -71,7 +71,7 @@ You can open the UI in two ways:
    From the project root:
 
    ```bash
-   cd /Users/viviliu/Documents/10_Vivi/ChatMyCV/frontend
+   cd ChatMyCV/frontend
    python -m http.server 4173
    ```
 
