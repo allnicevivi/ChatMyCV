@@ -1,18 +1,134 @@
-- app.py
-- models
-    - azure_models.py
-    - openai_models.py
-    - gemini_models.py
-- parsers
-    - docx_parser.py
-    - pdf_parser.py
-- vectordb
-    - chroma_vectordb.py
-- routes
-    - chat_routes.py
-    - uploaded_routes.py
-- services
-    - chat_servicce.py
-    - doc_processor.py
-- component
-    - base.py
+ChatMyCV
+========
+
+ChatMyCV is a small RAG (Retrieval-Augmented Generation) project that lets you chat with a CV/resume using an LLM backend and a simple, user-friendly web UI.
+
+The repository contains:
+
+- **backend**: Flask API for chat and document processing.
+- **frontend**: Static web app (HTML/CSS/JS) that talks to the backend.
+
+
+Backend
+-------
+
+### Requirements
+
+- Python 3.11+ (recommended)
+- Virtual environment (optional but recommended)
+
+Install dependencies from `requirements.txt`:
+
+```bash
+cd /Users/viviliu/Documents/10_Vivi/ChatMyCV
+python -m venv .venv
+source .venv/bin/activate  # on macOS / Linux
+pip install -r requirements.txt
+```
+
+You may also need to set any model/vectorstore credentials in your environment or config (for example Azure/OpenAI keys), according to your own setup.
+
+### Running the backend
+
+From the project root:
+
+```bash
+cd /Users/viviliu/Documents/10_Vivi/ChatMyCV
+python backend/app.py
+```
+
+By default this starts Flask on:
+
+- **Base URL**: `http://localhost:8000`
+- **Health check**: `GET /healthz`
+- **Chat endpoints**:
+  - `POST /chat/` – RAG chat (JSON in, JSON out)
+  - `POST /chat/stream` – streaming chat (Server-Sent Events)
+  - `POST /chat/clear` – clear history for one session
+  - `POST /chat/clear_all` – clear all histories
+- **Document processing**:
+  - Endpoints under `POST /process/...` (see `backend/routes/doc_process_routes.py`).
+
+
+Frontend
+--------
+
+The frontend is a simple static site located in `frontend/`:
+
+- `frontend/index.html` – main page and layout.
+- `frontend/styles.css` – styling.
+- `frontend/scripts/app.js` – logic for calling the backend and rendering messages.
+
+### Running the frontend
+
+You can open the UI in two ways:
+
+1. **Simplest (file URL)**  
+   Open `frontend/index.html` directly in your browser (double-click in Finder).  
+   This is fine for quick testing, as long as your backend is running at `http://localhost:8000`.
+
+2. **Recommended (local static server)**  
+   From the project root:
+
+   ```bash
+   cd /Users/viviliu/Documents/10_Vivi/ChatMyCV/frontend
+   python -m http.server 4173
+   ```
+
+   Then visit:
+
+   - `http://localhost:4173`
+
+In the UI:
+
+- Make sure **Backend URL** is set to `http://localhost:8000`.
+- Choose **Language** (`en` / `zhtw`) and optional **Interviewer persona** (HR or engineering).
+- Optionally adjust **Top K**, **Temperature**, **Model**, or override the **System prompt**.
+- Type in the chat box and:
+  - Press **Enter** to send,
+  - Press **Shift+Enter** for a new line.
+
+The UI shows the conversation and manages session IDs automatically in the background.
+
+
+Common issues
+-------------
+
+- **CORS / 3xx redirect on `/chat`**  
+  The frontend is wired to call `/chat/` (with a trailing slash), matching the Flask blueprint. If you change routes in the backend, make sure the frontend URLs match exactly.
+
+- **Backend not reachable**  
+  Ensure:
+  - Backend is running (`python backend/app.py`).
+  - The port in **Backend URL** matches the backend’s port (default `8000`).
+  - No firewall/VPN is blocking `localhost`.
+
+
+Project structure (high level)
+------------------------------
+
+```text
+backend/
+  app.py                 # Flask app factory and entrypoint
+  routes/                # Blueprints: chat, doc processing, uploads
+  services/              # Chat, doc processor, retriever, prompter
+  parsers/               # PDF, DOCX, TXT, Markdown parsers
+  vectorstores/          # Chroma (RAG vector DB)
+  data/                  # CV / script content
+
+frontend/
+  index.html             # ChatMyCV UI
+  styles.css             # Styling
+  scripts/app.js         # Frontend logic
+```
+
+
+Development tips
+----------------
+
+- Keep two terminals open:
+  - One for the backend (`python backend/app.py`).
+  - One for the frontend static server (`python -m http.server 4173 --directory frontend`).
+- Use the browser dev tools console to see debug logs (e.g. usage/token stats and errors).
+- When you change frontend files, simply refresh the browser.
+
