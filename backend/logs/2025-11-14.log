@@ -1,0 +1,9 @@
+[2025-11-14 16:30:00] - [DocProcess_Rte] - [process_file():45 INFO] Processing files in en
+[2025-11-14 16:30:02] - [ChromaUsage] - [add_data_to_collection():103 INFO] insert node_id_prefix="resume.md", data: 12
+[2025-11-14 16:30:02] - [DocProcessor] - [store_doc():45 INFO] node_cnt_before: 0, node_cnt_after: 12
+[2025-11-14 16:30:02] - [ChromaUsage] - [add_data_to_collection():103 INFO] insert node_id_prefix="resume_detail.md", data: 12
+[2025-11-14 16:30:02] - [DocProcessor] - [store_doc():45 INFO] node_cnt_before: 12, node_cnt_after: 24
+[2025-11-14 16:30:02] - [DocProcess_Rte] - [process_file():45 INFO] Processing files in zhtw
+[2025-11-14 16:30:02] - [ChromaUsage] - [add_data_to_collection():103 INFO] insert node_id_prefix="resume_detail_zhtw.md", data: 10
+[2025-11-14 16:30:02] - [DocProcessor] - [store_doc():45 INFO] node_cnt_before: 0, node_cnt_after: 10
+[2025-11-14 16:31:14] - [ChatService] - [_retrieve_context():68 INFO] Retrieved 3 documents for query: 你現在在哪裡工作...

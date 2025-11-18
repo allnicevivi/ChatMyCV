@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ChatMyCV Playground</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <div>
+        <h1>ChatMyCV Playground</h1>
+        <p>Test your RAG assistant with a clean, responsive UI.</p>
+      </div>
+      <div class="header-actions">
+        <button id="new-session-btn" type="button" class="ghost">New session</button>
+        <button id="clear-chat-btn" type="button" class="ghost" title="Clear history on the server">Clear remote history</button>
+      </div>
+    </header>
+
+    <section class="status-bar" id="status-bar">Ready</section>
+
+    <div class="app-layout">
+      <aside class="control-panel">
+        <h2>Conversation settings</h2>
+        <form id="settings-form">
+          <label class="field">
+            <span>Backend URL</span>
+            <input type="url" id="backend-url" name="backend-url" placeholder="http://localhost:8000" value="http://localhost:8000" required />
+          </label>
+
+          <label class="field">
+            <span>Language</span>
+            <select id="lang-select" name="lang">
+              <option value="en" selected>English</option>
+              <option value="zhtw">繁體中文</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Interviewer persona</span>
+            <select id="character-select" name="character">
+              <option value="">None</option>
+              <option value="hr">HR interviewer</option>
+              <option value="engineer">Engineering interviewer</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>System prompt (optional)</span>
+            <textarea id="system-prompt" rows="4" placeholder="Override the default instructions"></textarea>
+          </label>
+
+          <div class="field two-col">
+            <label>
+              <span>Top K</span>
+              <input type="number" id="k-input" min="1" max="10" value="5" />
+            </label>
+            <label>
+              <span>Temperature</span>
+              <input type="number" id="temp-input" min="0" max="2" step="0.1" value="0.7" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Model (optional)</span>
+            <input type="text" id="model-input" placeholder="Use backend default when empty" />
+          </label>
+        </form>
+
+        <div class="session-info" id="session-info">
+          <span>Session ID:</span>
+          <code>not started</code>
+        </div>
+      </aside>
+
+      <main class="chat-panel">
+        <div class="chat-log" id="chat-log" aria-live="polite"></div>
+
+        <form id="chat-form" class="chat-form">
+          <textarea id="user-input" rows="3" placeholder="Ask something about your CV... (Enter to send, Shift+Enter for a new line)" required></textarea>
+          <div class="chat-form__actions">
+            <button type="submit">Send</button>
+            <button type="button" id="reset-local-btn" class="ghost">Reset local chat</button>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="./scripts/app.js"></script>
+</body>
+</html>

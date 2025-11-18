@@ -160,7 +160,7 @@ class MarkdownReader():
 
 
 if __name__ == "__main__":
-    md_file = Path("./data/resume.md")
+    md_file = Path("./data/en/2025.11_ElgoAI.md")
 
     documents = MarkdownReader().load_data(
         file=md_file,

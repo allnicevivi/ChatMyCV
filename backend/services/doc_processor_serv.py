@@ -9,7 +9,7 @@ from pathlib import Path
 
 from backend.component.base import Node
 from modules import azure_client
-from vectorstores.chroma_vectordb import chroma_usage
+from vectorstores.chroma_vectordb import ChromaUsage
 from parsers import MarkdownReader
 from utils.app_logger import LoggerSetup
 
@@ -17,8 +17,9 @@ logger = LoggerSetup("DocProcessor").logger
 
 class DocProcessor:
 
-    def __init__(self) -> None:
-        pass
+    def __init__(self, lang: str) -> None:
+        self.chroma_usage = ChromaUsage(collection_name=f"chat_cv_{lang}")
+
     
     def parse_doc(self, file_path):
         return MarkdownReader().load_data(file=file_path)
@@ -31,16 +32,16 @@ class DocProcessor:
         embeddings = azure_client.get_embeddings(texts)
 
         # Ensuring or creating a collection
-        node_cnt_before = len(chroma_usage.get_existing_ids())
+        node_cnt_before = len(self.chroma_usage.get_existing_ids())
 
-        chroma_usage.add_data_to_collection(
+        self.chroma_usage.add_data_to_collection(
             texts=texts,
             metadatas=metadatas,
             embeddings=embeddings,
             node_id_prefix=file_path.name
         )
 
-        node_cnt_after = len(chroma_usage.get_existing_ids())
+        node_cnt_after = len(self.chroma_usage.get_existing_ids())
         logger.info(f'node_cnt_before: {node_cnt_before}, node_cnt_after: {node_cnt_after}')
 
 

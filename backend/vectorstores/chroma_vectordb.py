@@ -21,17 +21,21 @@ DEFAULT_CHROMA_DIR = Path(__file__).parent / ".chroma"
 collection_name = "chat_cv"
 
 class ChromaUsage:
-    def __init__(self, collection_name, persist_dir: Optional[str | Path] = None):
+    def __init__(
+        self, 
+        collection_name, 
+        persist_dir: Optional[str | Path] = None,
+        auto_create: bool = True
+    ):
 
         self.persist_dir = Path(persist_dir) if persist_dir else DEFAULT_CHROMA_DIR
         self.persist_dir.mkdir(parents=True, exist_ok=True)
         self.client = chromadb.PersistentClient(path=str(self.persist_dir))
+        self.collection_name = collection_name
 
         self.collection = self.get_collection(collection_name)
-        if not self.collection:
+        if not self.collection and auto_create:
             self.collection = self.create_collection(collection_name)
-
-
 
     # def get_collection_by_name(self, name: str) -> Optional[Collection]:
     #     try:
@@ -143,15 +147,30 @@ class ChromaUsage:
         collection_names = [collection.name for collection in collections]
         return collection_names
 
-chroma_usage = ChromaUsage(collection_name="chat_cv")
+    def delete_collection(self, collection_name: Optional[str] = None) -> bool:
+        """Delete a collection by name. Returns True if deletion succeeded."""
+        target_name = collection_name or self.collection_name
+        if not target_name:
+            return False
+
+        try:
+            self.client.delete_collection(name=target_name)
+            logger.info(f'delete collection "{target_name}"')
+            self.collection = None
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting collection {target_name}: {e}", exc_info=True)
+            return False
+
 
 if __name__ == "__main__":
     import pprint as pp
     from pathlib import Path
 
     # Example file path and embedding provider
-    file_path = Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data/resume_detail.md")
+    file_path = Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data/en/resume_detail.md")
     azure_client = AzureModule()
+    chroma_usage = ChromaUsage(collection_name="chat_cv_en")
 
     # Example texts, metadatas, embeddings
     texts = ["Sample text 1", "Sample text 2"]
