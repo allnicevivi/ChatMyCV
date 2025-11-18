@@ -15,4 +15,4 @@ frontend/dist/
 logs.
 
 # vectorstores
-backend/vectorstores/.chroma
+# backend/vectorstores/.chroma
