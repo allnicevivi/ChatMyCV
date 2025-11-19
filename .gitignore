@@ -12,7 +12,11 @@ frontend/dist/
 .venv/
 
 # Logs
-logs.
+logs/
+backend/logs
 
 # vectorstores
 # backend/vectorstores/.chroma
+
+# test
+test/
