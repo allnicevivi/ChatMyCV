@@ -27,7 +27,7 @@ def render_sidebar() -> Dict[str, Any]:
 
     lang = st.sidebar.radio(
         "Language", 
-        options=["en", "zhtw"], 
+        options=["English", "中文"], 
         index=0,
         help="Select the language you want to chat in.",
     )
