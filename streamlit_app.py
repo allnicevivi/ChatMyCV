@@ -25,7 +25,17 @@ def render_sidebar() -> Dict[str, Any]:
     """Render sidebar controls and return current configuration."""
     st.sidebar.title("ChatMyCV Settings")
 
-    lang = st.sidebar.radio("Language", options=["en", "zhtw"], index=0)
+    lang = st.sidebar.radio(
+        "Language", 
+        options=["en", "zhtw"], 
+        index=0,
+        help="Select the language you want to chat in.",
+    )
+    if lang == "English":
+        lang_code = "en"
+    elif lang == "中文":
+        lang_code = "zhtw"
+
     character_label = st.sidebar.radio(
         "Interviewer persona",
         options=["Engineering", "HR"],
@@ -67,7 +77,7 @@ def render_sidebar() -> Dict[str, Any]:
         st.session_state["session_id"] = None
 
     return {
-        "lang": lang,
+        "lang": lang_code,
         "character": character,
         "system_prompt": None,
         # "system_prompt": system_prompt or None,
