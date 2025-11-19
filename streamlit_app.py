@@ -10,8 +10,7 @@ BACKEND_DIR = ROOT_DIR / "backend"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
 
-from services import chat_service  # type: ignore  # noqa: E402
-
+from backend.services import chat_service  # type: ignore  # noqa: E402
 
 def init_session_state() -> None:
     """Initialize Streamlit session state keys."""
@@ -19,26 +18,32 @@ def init_session_state() -> None:
         st.session_state["messages"]: List[Dict[str, str]] = []
     if "session_id" not in st.session_state:
         st.session_state["session_id"]: Optional[str] = None
-
+    if "last_character" not in st.session_state:
+        st.session_state["last_character"]: Optional[str] = None
 
 def render_sidebar() -> Dict[str, Any]:
     """Render sidebar controls and return current configuration."""
     st.sidebar.title("ChatMyCV Settings")
 
-    lang = st.sidebar.selectbox("Language", options=["en", "zhtw"], index=0)
-    character_label = st.sidebar.selectbox(
+    lang = st.sidebar.radio("Language", options=["en", "zhtw"], index=0)
+    character_label = st.sidebar.radio(
         "Interviewer persona",
-        options=["Default", "HR", "Engineering"],
+        options=["HR", "Engineering"],
         index=0,
         help="Controls the system prompt used for responses.",
     )
-    if character_label == "Default":
-        character: Optional[str] = None
-    elif character_label == "HR":
-        character = "hr"
-    else:
-        character = "engineer"
+    character = "hr" if character_label == "HR" else "engineer"
 
+    # Check if the interview persona has changed
+    if character != st.session_state.get("last_character"):
+        # Clear conversation history
+        st.session_state["messages"] = []
+
+        # Reset session_id
+        st.session_state["session_id"] = None
+
+    st.session_state["last_character"] = character
+    
     system_prompt = st.sidebar.text_area(
         "Custom system prompt (optional)",
         value="",
@@ -66,7 +71,6 @@ def render_sidebar() -> Dict[str, Any]:
         "character": character,
         "system_prompt": system_prompt or None,
     }
-
 
 def render_chat_ui(config: Dict[str, Any]) -> None:
     """Render the main chat interface."""
@@ -118,6 +122,7 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
                 model=None,
             )
+            print(f'response: {response}')
             answer = response.get("content") or "No answer was generated."
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"
@@ -126,7 +131,6 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
 
     # Save assistant message to history
     st.session_state["messages"].append({"role": "assistant", "content": answer})
-
 
 def main() -> None:
     st.set_page_config(
@@ -138,8 +142,5 @@ def main() -> None:
     config = render_sidebar()
     render_chat_ui(config)
 
-
 if __name__ == "__main__":
     main()
-
-

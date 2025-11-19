@@ -82,7 +82,8 @@ class ChatService:
             System prompt string
         """
         if character is None:
-            return self.default_system_prompt
+            return prompter.HR_cot_system_prompt
+            # return self.default_system_prompt
         
         if character == "engineer":
             return prompter.EM_cot_system_prompt

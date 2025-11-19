@@ -1,0 +1,384 @@
+[2025-11-19 09:24:16] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: what's your name...
+[2025-11-19 09:24:16] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: what's your name...
+[2025-11-19 09:24:17] - [ChatService] - [chat():367 INFO] chat response: <answer>
+My name is Vivi Liu. It's great to meet you!
+</answer>
+[2025-11-19 09:24:17] - [ChatService] - [chat():367 INFO] chat response: <answer>
+My name is Vivi Liu. It's great to meet you!
+</answer>
+[2025-11-19 09:24:27] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:24:27] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:24:30] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking where I currently work. The context shows I am currently an AI Engineer at NUWA Robotics in Taipei since May 2024. I also have past experience at MetaEdge and Gosky AI.
+
+I will answer with my current role and company, and maybe briefly mention previous companies if appropriate.
+
+No hallucination detected.
+
+Possible follow-up: "What kind of projects do you work on at NUWA Robotics?" or "Can you tell me about your role there?"
+</thinking>
+
+<answer>
+I’m currently working as an AI Engineer at NUWA Robotics in Taipei. I’ve been there since May 2024, focusing on building AI systems like RAG and multi-agent workflows to help enterprise clients. Before that, I worked at MetaEdge and Gosky AI, gaining valuable experience in AI and data analysis. Would you like me to share more about the projects I’m involved with?
+</answer>
+[2025-11-19 09:24:30] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking where I currently work. The context shows I am currently an AI Engineer at NUWA Robotics in Taipei since May 2024. I also have past experience at MetaEdge and Gosky AI.
+
+I will answer with my current role and company, and maybe briefly mention previous companies if appropriate.
+
+No hallucination detected.
+
+Possible follow-up: "What kind of projects do you work on at NUWA Robotics?" or "Can you tell me about your role there?"
+</thinking>
+
+<answer>
+I’m currently working as an AI Engineer at NUWA Robotics in Taipei. I’ve been there since May 2024, focusing on building AI systems like RAG and multi-agent workflows to help enterprise clients. Before that, I worked at MetaEdge and Gosky AI, gaining valuable experience in AI and data analysis. Would you like me to share more about the projects I’m involved with?
+</answer>
+[2025-11-19 09:24:58] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:24:58] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:25:01] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for a more detailed overview of my AI Engineer journey.
+Step 2: The context includes detailed work experience at NUWA Robotics and MetaEdge as AI Engineer roles.
+Step 3: I will describe my key responsibilities and accomplishments at both companies, highlighting technical skills and impacts.
+Step 4: Ensure the explanation is clear and approachable for HR, emphasizing impact and collaboration.
+Step 5: Suggest possible follow-up questions about specific projects or teamwork.
+</thinking>
+
+<answer>
+Absolutely! At NUWA Robotics, I’ve been leading the design of a retrieval-augmented generation system from scratch, which improved recall by 30% and cut latency in half. I also developed multi-agent AI workflows that support tasks like named entity recognition and multilingual dialogue, helping over 10 enterprise clients across Taiwan, Japan, and the US adopt our solutions smoothly. Additionally, I optimized processing pipelines with RabbitMQ and asynchronous techniques to boost performance and reliability under heavy loads. 
+
+Before that, at MetaEdge, I focused on building an in-house RAG pipeline that improved domain-specific recall by up to 20%. I also implemented semantic similarity workflows and refactored legacy AI systems, increasing efficiency and reducing memory usage significantly. Throughout these roles, I’ve worked closely with cross-functional teams to translate business needs into practical AI solutions.
+
+If you’d like, I can tell you more about specific projects or how I collaborate with product and sales teams to align AI work with business goals.  
+</answer>
+[2025-11-19 09:25:01] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for a more detailed overview of my AI Engineer journey.
+Step 2: The context includes detailed work experience at NUWA Robotics and MetaEdge as AI Engineer roles.
+Step 3: I will describe my key responsibilities and accomplishments at both companies, highlighting technical skills and impacts.
+Step 4: Ensure the explanation is clear and approachable for HR, emphasizing impact and collaboration.
+Step 5: Suggest possible follow-up questions about specific projects or teamwork.
+</thinking>
+
+<answer>
+Absolutely! At NUWA Robotics, I’ve been leading the design of a retrieval-augmented generation system from scratch, which improved recall by 30% and cut latency in half. I also developed multi-agent AI workflows that support tasks like named entity recognition and multilingual dialogue, helping over 10 enterprise clients across Taiwan, Japan, and the US adopt our solutions smoothly. Additionally, I optimized processing pipelines with RabbitMQ and asynchronous techniques to boost performance and reliability under heavy loads. 
+
+Before that, at MetaEdge, I focused on building an in-house RAG pipeline that improved domain-specific recall by up to 20%. I also implemented semantic similarity workflows and refactored legacy AI systems, increasing efficiency and reducing memory usage significantly. Throughout these roles, I’ve worked closely with cross-functional teams to translate business needs into practical AI solutions.
+
+If you’d like, I can tell you more about specific projects or how I collaborate with product and sales teams to align AI work with business goals.  
+</answer>
+[2025-11-19 09:26:50] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:26:50] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 09:26:55] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks about challenges faced and how I handled them.
+Step 2: In the <context>, I see several achievements implying challenges: building RAG systems from scratch, optimizing pipelines for latency and throughput, fine-tuning models for edge deployment, refactoring legacy systems, collaborating cross-functionally, and handling business requirements.
+Step 3: I can summarize these challenges as technical complexity, performance optimization, scalability, and aligning AI solutions with business goals.
+Step 4: I will answer with a few examples of challenges and how I addressed them, keeping it high-level and clear.
+Step 5: Suggest possible follow-up questions about specific projects or teamwork.
+
+</thinking>
+
+<answer>
+Throughout my AI engineering journey, I’ve encountered several challenges, especially around building scalable and efficient AI systems from scratch. For example, at NUWA Robotics, designing a full RAG system involved balancing recall improvement with reducing system latency. To tackle this, I used sparse embeddings and weighted search techniques, which helped improve recall by 30% while cutting latency by half.
+
+Another challenge was optimizing pipeline throughput under high-load conditions. I implemented RabbitMQ combined with multithreading and asynchronous processing to ensure the system stayed reliable and fast, reducing end-to-end latency significantly.
+
+At MetaEdge, refactoring legacy AI systems was tricky because it required improving runtime efficiency and memory usage without disrupting existing deployments. I approached this by carefully analyzing system bottlenecks and incrementally optimizing workflows, which increased efficiency by 30% and reduced memory use by 90%.
+
+Lastly, aligning AI solutions with business needs often required close collaboration with sales and product teams, translating ambiguous requirements into clear technical goals. This cross-functional teamwork was essential in delivering AI products that truly added value to clients.
+
+If you’d like, I’m happy to share more about how I approach problem-solving or specific challenges from any of these projects.
+[2025-11-19 09:26:55] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks about challenges faced and how I handled them.
+Step 2: In the <context>, I see several achievements implying challenges: building RAG systems from scratch, optimizing pipelines for latency and throughput, fine-tuning models for edge deployment, refactoring legacy systems, collaborating cross-functionally, and handling business requirements.
+Step 3: I can summarize these challenges as technical complexity, performance optimization, scalability, and aligning AI solutions with business goals.
+Step 4: I will answer with a few examples of challenges and how I addressed them, keeping it high-level and clear.
+Step 5: Suggest possible follow-up questions about specific projects or teamwork.
+
+</thinking>
+
+<answer>
+Throughout my AI engineering journey, I’ve encountered several challenges, especially around building scalable and efficient AI systems from scratch. For example, at NUWA Robotics, designing a full RAG system involved balancing recall improvement with reducing system latency. To tackle this, I used sparse embeddings and weighted search techniques, which helped improve recall by 30% while cutting latency by half.
+
+Another challenge was optimizing pipeline throughput under high-load conditions. I implemented RabbitMQ combined with multithreading and asynchronous processing to ensure the system stayed reliable and fast, reducing end-to-end latency significantly.
+
+At MetaEdge, refactoring legacy AI systems was tricky because it required improving runtime efficiency and memory usage without disrupting existing deployments. I approached this by carefully analyzing system bottlenecks and incrementally optimizing workflows, which increased efficiency by 30% and reduced memory use by 90%.
+
+Lastly, aligning AI solutions with business needs often required close collaboration with sales and product teams, translating ambiguous requirements into clear technical goals. This cross-functional teamwork was essential in delivering AI products that truly added value to clients.
+
+If you’d like, I’m happy to share more about how I approach problem-solving or specific challenges from any of these projects.
+[2025-11-19 09:28:30] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: list the challenging yo...
+[2025-11-19 09:28:30] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: list the challenging yo...
+[2025-11-19 09:28:32] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for the candidate's exact current salary.
+Step 2: Review context for any salary information.
+Step 3: The context does not mention any salary details.
+Step 4: Following the rules, must respond with fallback since no salary info is provided.
+Step 5: Keep tone warm and professional, invite further discussion.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further!
+</answer>
+[2025-11-19 09:28:32] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for the candidate's exact current salary.
+Step 2: Review context for any salary information.
+Step 3: The context does not mention any salary details.
+Step 4: Following the rules, must respond with fallback since no salary info is provided.
+Step 5: Keep tone warm and professional, invite further discussion.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further!
+</answer>
+[2025-11-19 09:59:18] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: list the challenging yo...
+[2025-11-19 09:59:18] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: list the challenging yo...
+[2025-11-19 09:59:20] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user asks about the number of users supported in production by my systems. The context mentions serving 10+ enterprise clients but does not specify the number of end users per system or total user counts. There is no explicit info about user volume or scale of users supported. So I cannot provide a precise answer about user counts.
+
+Following the fallback rule, I should respond with a polite fallback inviting further discussion.
+
+I can also add a friendly prompt to continue the conversation, such as asking about the scale or type of users the interviewer is interested in.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the types of clients and industries I’ve worked with.
+[2025-11-19 09:59:20] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user asks about the number of users supported in production by my systems. The context mentions serving 10+ enterprise clients but does not specify the number of end users per system or total user counts. There is no explicit info about user volume or scale of users supported. So I cannot provide a precise answer about user counts.
+
+Following the fallback rule, I should respond with a polite fallback inviting further discussion.
+
+I can also add a friendly prompt to continue the conversation, such as asking about the scale or type of users the interviewer is interested in.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the types of clients and industries I’ve worked with.
+[2025-11-19 09:59:35] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+assistant: Throughout my AI e...
+[2025-11-19 09:59:35] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+assistant: Throughout my AI e...
+[2025-11-19 09:59:37] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The user asks about the candidate's team at NUWA Robotics.
+Step 2: The context details the candidate's role and collaborations but does not explicitly mention team size or structure.
+Step 3: The candidate collaborates closely with sales and product teams, and supports 10+ enterprise clients, but no direct info about the immediate AI engineering team.
+Step 4: No explicit team details are provided, so fallback response is appropriate.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the cross-functional collaboration I do with product and sales teams at NUWA Robotics.
+</answer>
+[2025-11-19 09:59:37] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The user asks about the candidate's team at NUWA Robotics.
+Step 2: The context details the candidate's role and collaborations but does not explicitly mention team size or structure.
+Step 3: The candidate collaborates closely with sales and product teams, and supports 10+ enterprise clients, but no direct info about the immediate AI engineering team.
+Step 4: No explicit team details are provided, so fallback response is appropriate.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the cross-functional collaboration I do with product and sales teams at NUWA Robotics.
+</answer>
+[2025-11-19 09:59:53] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 09:59:53] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 09:59:55] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The question asks specifically whether the RAG pipeline was based on Faiss or ScaNN.
+
+Check the context for any mention of Faiss or ScaNN in relation to RAG pipelines at NUWA Robotics or MetaEdge. The context mentions building RAG pipelines and using sparse embeddings, weighted search, and tools like Milvus and ChromaDB. However, there is no explicit mention of Faiss or ScaNN.
+
+Therefore, the context does not provide a direct answer to whether Faiss or ScaNN was used.
+
+Fallback response is appropriate.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the general architecture and technologies I used in those RAG systems.
+</answer>
+[2025-11-19 09:59:55] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The question asks specifically whether the RAG pipeline was based on Faiss or ScaNN.
+
+Check the context for any mention of Faiss or ScaNN in relation to RAG pipelines at NUWA Robotics or MetaEdge. The context mentions building RAG pipelines and using sparse embeddings, weighted search, and tools like Milvus and ChromaDB. However, there is no explicit mention of Faiss or ScaNN.
+
+Therefore, the context does not provide a direct answer to whether Faiss or ScaNN was used.
+
+Fallback response is appropriate.
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the general architecture and technologies I used in those RAG systems.
+</answer>
+[2025-11-19 10:00:09] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 10:00:09] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 10:00:13] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The question is about which vector database was used for the RAG system.
+
+From the provided context, under "SKILLS" and "WORK EXPERIENCE" at NUWA Robotics, the candidate lists AI tools including Milvus and ChromaDB, both popular vector databases. However, the context does not explicitly state which vector database was used for the RAG system.
+
+Given the ambiguity, the best response is to politely indicate the lack of explicit information and offer to discuss further via other channels.
+
+Optionally, I can mention that Milvus and ChromaDB are among the tools I'm familiar with.
+
+This aligns with the fallback approach used in previous responses about specific tech details.
+
+No hallucination; no exact mention of vector DB usage for RAG system in the context.
+
+Therefore, fallback reply with a friendly note and offer to discuss more.
+
+Possible follow-up suggestion: "Would you like me to share more about the architecture of the RAG system or other tools I used?"
+
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the general architecture and tools I used in building RAG systems.
+</answer>
+[2025-11-19 10:00:13] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The question is about which vector database was used for the RAG system.
+
+From the provided context, under "SKILLS" and "WORK EXPERIENCE" at NUWA Robotics, the candidate lists AI tools including Milvus and ChromaDB, both popular vector databases. However, the context does not explicitly state which vector database was used for the RAG system.
+
+Given the ambiguity, the best response is to politely indicate the lack of explicit information and offer to discuss further via other channels.
+
+Optionally, I can mention that Milvus and ChromaDB are among the tools I'm familiar with.
+
+This aligns with the fallback approach used in previous responses about specific tech details.
+
+No hallucination; no exact mention of vector DB usage for RAG system in the context.
+
+Therefore, fallback reply with a friendly note and offer to discuss more.
+
+Possible follow-up suggestion: "Would you like me to share more about the architecture of the RAG system or other tools I used?"
+
+</thinking>
+
+<answer>
+I'm sorry, but I don't have that information right now. However, feel free to reach out to me via email or LinkedIn, and I'd be happy to discuss it further! If you'd like, I can also share more about the general architecture and tools I used in building RAG systems.
+</answer>
+[2025-11-19 10:00:22] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 10:00:22] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: great! what's your exac...
+[2025-11-19 10:00:25] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking specifically which vector database (vectodb) was used for the RAG system.  
+From the <context>, the skills section lists vector DB tools like Milvus and ChromaDB, and AI tools including LangChain and LlamaIndex.  
+However, the work experience details for NUWA Robotics and MetaEdge mention building RAG systems but do not explicitly specify which vector DB was used.  
+Since the information on the exact vectodb is not provided, I must use the fallback response.  
+I can mention the general architecture and tools without specifying the exact vectodb.  
+This approach respects the rules to avoid hallucination and keeps the tone professional and open for further discussion.  
+</thinking>
+
+<answer>
+I don’t have the exact vector database details on hand, but I’d be happy to walk you through the general architecture and tools I used in building those RAG systems. Feel free to reach out anytime via email or LinkedIn if you’d like to discuss it further!
+</answer>
+[2025-11-19 10:00:25] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking specifically which vector database (vectodb) was used for the RAG system.  
+From the <context>, the skills section lists vector DB tools like Milvus and ChromaDB, and AI tools including LangChain and LlamaIndex.  
+However, the work experience details for NUWA Robotics and MetaEdge mention building RAG systems but do not explicitly specify which vector DB was used.  
+Since the information on the exact vectodb is not provided, I must use the fallback response.  
+I can mention the general architecture and tools without specifying the exact vectodb.  
+This approach respects the rules to avoid hallucination and keeps the tone professional and open for further discussion.  
+</thinking>
+
+<answer>
+I don’t have the exact vector database details on hand, but I’d be happy to walk you through the general architecture and tools I used in building those RAG systems. Feel free to reach out anytime via email or LinkedIn if you’d like to discuss it further!
+</answer>
+[2025-11-19 10:01:57] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: what's your name...
+[2025-11-19 10:01:57] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: what's your name...
+[2025-11-19 10:01:57] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: what's your name...
+[2025-11-19 10:01:58] - [ChatService] - [chat():367 INFO] chat response: <answer>
+My name is Vivi Liu, and I’m an AI engineer with experience in building production-ready AI systems, especially in large language models and retrieval-augmented generation workflows. It’s great to meet you!
+</answer>
+[2025-11-19 10:01:58] - [ChatService] - [chat():367 INFO] chat response: <answer>
+My name is Vivi Liu, and I’m an AI engineer with experience in building production-ready AI systems, especially in large language models and retrieval-augmented generation workflows. It’s great to meet you!
+</answer>
+[2025-11-19 10:01:58] - [ChatService] - [chat():367 INFO] chat response: <answer>
+My name is Vivi Liu, and I’m an AI engineer with experience in building production-ready AI systems, especially in large language models and retrieval-augmented generation workflows. It’s great to meet you!
+</answer>
+[2025-11-19 10:02:02] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:02] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:02] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:05] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for current and possibly past workplaces.
+Step 2: The context shows Vivi Liu currently works at NUWA Robotics since May 2024, previously at MetaEdge (Feb 2023 - Apr 2024), and before that at Gosky AI (Feb 2022 - Dec 2022).
+Step 3: I will answer with current workplace and briefly mention recent past roles to give a fuller picture.
+Step 4: Add a conversational tone and offer to share more if desired.
+</thinking>
+
+<answer>
+I’m currently working as an AI Engineer at NUWA Robotics in Taipei since May 2024. Before that, I worked at MetaEdge as an AI Software Engineer and earlier as a Data Analyst at Gosky AI. I’ve really enjoyed the variety of roles and opportunities to build AI systems that make an impact. If you'd like, I can tell you more about the projects I’ve worked on at any of these companies.
+</answer>
+[2025-11-19 10:02:05] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for current and possibly past workplaces.
+Step 2: The context shows Vivi Liu currently works at NUWA Robotics since May 2024, previously at MetaEdge (Feb 2023 - Apr 2024), and before that at Gosky AI (Feb 2022 - Dec 2022).
+Step 3: I will answer with current workplace and briefly mention recent past roles to give a fuller picture.
+Step 4: Add a conversational tone and offer to share more if desired.
+</thinking>
+
+<answer>
+I’m currently working as an AI Engineer at NUWA Robotics in Taipei since May 2024. Before that, I worked at MetaEdge as an AI Software Engineer and earlier as a Data Analyst at Gosky AI. I’ve really enjoyed the variety of roles and opportunities to build AI systems that make an impact. If you'd like, I can tell you more about the projects I’ve worked on at any of these companies.
+</answer>
+[2025-11-19 10:02:05] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+Step 1: The question asks for current and possibly past workplaces.
+Step 2: The context shows Vivi Liu currently works at NUWA Robotics since May 2024, previously at MetaEdge (Feb 2023 - Apr 2024), and before that at Gosky AI (Feb 2022 - Dec 2022).
+Step 3: I will answer with current workplace and briefly mention recent past roles to give a fuller picture.
+Step 4: Add a conversational tone and offer to share more if desired.
+</thinking>
+
+<answer>
+I’m currently working as an AI Engineer at NUWA Robotics in Taipei since May 2024. Before that, I worked at MetaEdge as an AI Software Engineer and earlier as a Data Analyst at Gosky AI. I’ve really enjoyed the variety of roles and opportunities to build AI systems that make an impact. If you'd like, I can tell you more about the projects I’ve worked on at any of these companies.
+</answer>
+[2025-11-19 10:02:12] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:12] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:12] - [ChatService] - [_retrieve_context():148 INFO] Retrieved 5 documents for query: Conversation so far:
+user: what's your name
+assist...
+[2025-11-19 10:02:14] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking for the candidate's name again. The context clearly states the candidate's name is Vivi Liu (劉米婷 Mi-Ting Liu).  
+I will provide a concise, professional response with the name and a brief intro as done previously.
+</thinking>
+
+<answer>
+My name is Vivi Liu. I’m an AI engineer specializing in large language models, retrieval-augmented generation, and edge-deployed NLP solutions. It’s great to meet you!
+</answer>
+[2025-11-19 10:02:14] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking for the candidate's name again. The context clearly states the candidate's name is Vivi Liu (劉米婷 Mi-Ting Liu).  
+I will provide a concise, professional response with the name and a brief intro as done previously.
+</thinking>
+
+<answer>
+My name is Vivi Liu. I’m an AI engineer specializing in large language models, retrieval-augmented generation, and edge-deployed NLP solutions. It’s great to meet you!
+</answer>
+[2025-11-19 10:02:14] - [ChatService] - [chat():367 INFO] chat response: <thinking>
+The user is asking for the candidate's name again. The context clearly states the candidate's name is Vivi Liu (劉米婷 Mi-Ting Liu).  
+I will provide a concise, professional response with the name and a brief intro as done previously.
+</thinking>
+
+<answer>
+My name is Vivi Liu. I’m an AI engineer specializing in large language models, retrieval-augmented generation, and edge-deployed NLP solutions. It’s great to meet you!
+</answer>
