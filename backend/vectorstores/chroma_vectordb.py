@@ -168,7 +168,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     # Example file path and embedding provider
-    file_path = Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data/en/resume_detail.md")
+    file_path = Path("./data/en/resume_detail.md")
     azure_client = AzureModule()
     chroma_usage = ChromaUsage(collection_name="chat_cv_en")
 
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     # )
 
     # chroma_usage.add_data_to_collection(
-    #     # file_path=Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data_2/resume.md"),
+    #     # file_path=Path("./data_2/resume.md"),
     #     texts=texts,
     #     metadatas=metadatas,
     #     embeddings=embeddings

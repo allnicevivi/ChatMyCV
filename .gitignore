@@ -20,3 +20,7 @@ backend/logs
 
 # test
 test/
+
+# cache
+__pycache__/
+**/__pycache__/

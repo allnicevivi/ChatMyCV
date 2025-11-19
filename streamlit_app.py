@@ -28,7 +28,7 @@ def render_sidebar() -> Dict[str, Any]:
     lang = st.sidebar.radio("Language", options=["en", "zhtw"], index=0)
     character_label = st.sidebar.radio(
         "Interviewer persona",
-        options=["HR", "Engineering"],
+        options=["Engineering", "HR"],
         index=0,
         help="Controls the system prompt used for responses.",
     )
@@ -44,12 +44,12 @@ def render_sidebar() -> Dict[str, Any]:
 
     st.session_state["last_character"] = character
     
-    system_prompt = st.sidebar.text_area(
-        "Custom system prompt (optional)",
-        value="",
-        height=140,
-        help="Override the default/character prompt. Leave empty to use defaults.",
-    )
+    # system_prompt = st.sidebar.text_area(
+    #     "Custom system prompt (optional)",
+    #     value="",
+    #     height=140,
+    #     help="Override the default/character prompt. Leave empty to use defaults.",
+    # )
 
     if st.sidebar.button("Clear conversation", use_container_width=True):
         # Clear local history
@@ -69,7 +69,8 @@ def render_sidebar() -> Dict[str, Any]:
     return {
         "lang": lang,
         "character": character,
-        "system_prompt": system_prompt or None,
+        "system_prompt": None,
+        # "system_prompt": system_prompt or None,
     }
 
 def render_chat_ui(config: Dict[str, Any]) -> None:
@@ -122,7 +123,7 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
                 model=None,
             )
-            print(f'response: {response}')
+            # print(f'response: {response}')
             answer = response.get("content") or "No answer was generated."
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"

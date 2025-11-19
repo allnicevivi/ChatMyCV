@@ -104,8 +104,8 @@ if __name__ == "__main__":
 
 
     file_paths = [
-        Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data/resume.md"),
-        Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data/resume_detail.md")
+        Path("./data/resume.md"),
+        Path("./data/resume_detail.md")
     ]
     # collection = load_or_build_collection_for_markdown(file_path, embedder=AzureModule())
 

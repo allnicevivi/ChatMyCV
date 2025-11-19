@@ -21,7 +21,6 @@ import pprint as pp
 logger = LoggerSetup("MDParser").logger
 
 
-import imp
 from typing import Any, List, Tuple, Optional, Dict
 import re
 from pathlib import Path

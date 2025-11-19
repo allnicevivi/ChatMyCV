@@ -34,7 +34,7 @@ def process_file():
     else:
         langs_to_process = allowed_langs
 
-    directory_path = Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data")
+    directory_path = Path("./data")
 
     lang_files: dict[str, list[Path]] = {}
     for lang_code in langs_to_process:
@@ -122,7 +122,7 @@ def delete_collection():
 
 
 if __name__ == "__main__":
-    directory_path = Path("/Users/viviliu/Documents/10_Vivi/ChatMyCV/backend/data")
+    directory_path = Path("./data")
     files = list(directory_path.iterdir())
     # Get the last folder name from the directory path
     last_folder_name = directory_path.parts[-1] if directory_path.parts else None
