@@ -159,4 +159,8 @@ async def main() -> None:
     await render_chat_ui(config)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Streamlit Cloud has its own event loop management
+    # Using new_event_loop() is more compatible across environments
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(main())

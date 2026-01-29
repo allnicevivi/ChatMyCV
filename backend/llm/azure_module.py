@@ -9,15 +9,19 @@ import httpx
 import asyncio
 
 # nest_asyncio is needed for running async code in environments with existing event loops
-# but fails on Streamlit Cloud's event loop type, so we handle it gracefully
+# but fails on Streamlit Cloud's event loop type - we must skip importing it entirely
+# because even importing nest_asyncio modifies asyncio.run() behavior
+import os as _os
+_is_streamlit_cloud = _os.path.exists("/mount/src")
+
 _nest_asyncio_applied = False
-try:
-    import nest_asyncio
-    nest_asyncio.apply()
-    _nest_asyncio_applied = True
-except (ValueError, RuntimeError):
-    # Streamlit Cloud has its own event loop management
-    pass
+if not _is_streamlit_cloud:
+    try:
+        import nest_asyncio
+        nest_asyncio.apply()
+        _nest_asyncio_applied = True
+    except (ValueError, RuntimeError):
+        pass
 
 import os
 import time
