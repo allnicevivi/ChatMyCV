@@ -83,6 +83,25 @@ class ChatService:
         else:
             return last_session_id
     
+    def _retrieve_context(self, query: str, k: int = 5) -> List[tuple]:
+        """
+        Asynchronously retrieve relevant context from the vectorstore using hybrid search.
+        """
+        try:
+            # Get embedding for the query
+            query_embedding = self.embed_client.embed(query)
+            
+            # Query the vectorstore
+            results = self.vectorstore.query_collection(
+                query_embedding=query_embedding,
+                k=k
+            )
+            logger.info(f"Retrieved {len(results)} documents for query: {query[:50]}...")
+            return results
+        except Exception as e:
+            logger.error(f"Error retrieving context: {e}", exc_info=True)
+            return []
+
     async def _aretrieve_context(self, query: str, k: int = 5) -> List[tuple]:
         """
         Asynchronously retrieve relevant context from the vectorstore using hybrid search.
@@ -182,6 +201,70 @@ class ChatService:
             {"role": "user", "content": user_prompt}
         ]
     
+    def chat(self, **kwargs) -> Dict[str, Any]:
+        """
+        Process a chat query with RAG asynchronously.
+        """
+        self.lang = kwargs.get("lang", "en")
+        if self.lang == "zhtw":
+            self.vectorstore = chroma_usage_zhtw
+        else:
+            self.vectorstore = chroma_usage_en
+
+        try:
+            self._conversation_store.cleanup_expired()
+            session_id = kwargs.get("session_id")
+            conversation_history = kwargs.get("conversation_history")
+
+            if session_id and not conversation_history:
+                conversation_history = self._conversation_store.get_history(session_id)
+
+            query = kwargs["query"]
+            retrieval_query = self._compose_retrieval_query(query, conversation_history)
+            retrieved_docs = self._retrieve_context(retrieval_query, k=kwargs.get("k", 5))
+            context = self._format_context(retrieved_docs)
+            
+            if not context:
+                return {"content": None, "usage": None, "retrieved_docs_count": 0, "context_used": False}
+
+            system_prompt = kwargs.get("system_prompt") or self.get_system_prompt(kwargs.get("character"))
+            
+            messages = self._build_messages(
+                user_query=query,
+                context=context,
+                conversation_history=conversation_history,
+                system_prompt=system_prompt,
+                lang=self.lang
+            )
+
+            # Only pass relevant kwargs to llm.chat()
+            llm_kwargs = {
+                k: v for k, v in kwargs.items()
+                if k in ("temperature", "max_tokens", "engine")
+            }
+            response = self.llm.chat(messages=messages, **llm_kwargs)
+            response_content = response.get("content", "")
+            logger.info(f"LLM Raw Response Content: {response_content}")
+
+            content_after_answer = re.search(r'<answer>(.*)', response_content, re.DOTALL)
+            response_content = content_after_answer.group(1).strip() if content_after_answer else response_content
+
+            content_before_answer = re.search(r'(.*)</answer>', response_content, re.DOTALL)
+            final_answer = content_before_answer.group(1).strip() if content_before_answer else response_content
+            
+            if session_id and final_answer:
+                self._conversation_store.append(session_id, query, final_answer)
+
+            return {
+                "content": final_answer,
+                "usage": response.get("usage", {}),
+                "retrieved_docs_count": len(retrieved_docs),
+                "context_used": bool(context)
+            }
+        except Exception as e:
+            logger.error(f"Error in async chat service: {e}", exc_info=True)
+            raise
+        
     async def achat(self, **kwargs) -> Dict[str, Any]:
         """
         Process a chat query with RAG asynchronously.

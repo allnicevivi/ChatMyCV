@@ -94,7 +94,7 @@ def render_sidebar() -> Dict[str, Any]:
         # "system_prompt": system_prompt or None,
     }
 
-async def render_chat_ui(config: Dict[str, Any]) -> None:
+def render_chat_ui(config: Dict[str, Any]) -> None:
     """Render the main chat interface."""
     st.title("ChatMyCV")
     st.write(
@@ -132,7 +132,7 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
         assistant_placeholder.markdown("_Thinking..._")
 
         try:
-            response = await chat_service.achat(  # type: ignore[attr-defined]
+            response = chat_service.chat(  # type: ignore[attr-defined]
                 lang=config["lang"],
                 query=user_input,
                 conversation_history=conversation_history,
@@ -153,7 +153,7 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
     # Save assistant message to history
     st.session_state["messages"].append({"role": "assistant", "content": answer})
 
-async def main() -> None:
+def main() -> None:
     st.set_page_config(
         page_title="ChatMyCV - Streamlit",
         layout="wide",
@@ -161,7 +161,7 @@ async def main() -> None:
 
     init_session_state()
     config = render_sidebar()
-    await render_chat_ui(config)
+    render_chat_ui(config)
 
 def run_async(coro):
     """Run async coroutine in a way compatible with Streamlit Cloud."""
@@ -171,7 +171,7 @@ def run_async(coro):
         return loop.run_until_complete(coro)
     finally:
         loop.close()
-        
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
 

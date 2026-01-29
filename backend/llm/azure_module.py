@@ -33,6 +33,8 @@ class AzureOpenaiLLM(LLM):
         super().__init__(temperature, max_tokens, timeout, provider, **kwargs)
         self._client = self._create_client()
         self._embed_client = self._create_client()
+        self._aclient = self._acreate_client()
+        self._embed_aclient = self._acreate_client()
         # Handle warmup in environments with or without existing event loops
         # self._run_warmup()
 
@@ -57,7 +59,17 @@ class AzureOpenaiLLM(LLM):
                 # Skip warmup if no safe way to run it
                 print(f"[AzureOpenaiLLM] Warmup skipped: no event loop available")
 
-    def _create_client(self) -> AsyncAzureOpenAI:
+    def _create_client(self) -> AzureOpenAI:
+
+        client = AzureOpenAI(
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+            azure_endpoint=os.getenv("AZURE_OPENAI_API_BASE"),
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        )
+
+        return client
+
+    def _acreate_client(self) -> AsyncAzureOpenAI:
 
         client = AsyncAzureOpenAI(
             api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
@@ -77,7 +89,7 @@ class AzureOpenaiLLM(LLM):
         except Exception as e:
             print(f"[AzureOpenaiLLM] Warm-up failed: {e}")
     
-    async def chat(self, prompt: str = "", system_prompt: str = "", messages: Optional[list[dict[str, str]]] = None, temperature: Optional[float] = None, engine: str="", max_tokens: Optional[int] = None) -> Optional[str]:
+    def chat(self, prompt: str = "", system_prompt: str = "", messages: Optional[list[dict[str, str]]] = None, temperature: Optional[float] = None, engine: str="", max_tokens: Optional[int] = None) -> Optional[str]:
         
         if not messages:
             messages = []
@@ -86,7 +98,7 @@ class AzureOpenaiLLM(LLM):
             if prompt:
                 messages.append({"role": "user", "content": prompt})
         
-        response = await self._client.chat.completions.create(
+        response = self._client.chat.completions.create(
             model=engine or os.getenv("AZURE_OPENAI_LLM_ENGINE"),
             messages=messages,
             temperature=temperature or self.temperature,  # 值越低则输出文本随机性越低
@@ -106,7 +118,7 @@ class AzureOpenaiLLM(LLM):
 
         print(f"[AzureOpenaiLLM.stream] Starting API call...")
         try:
-            response = await self._client.chat.completions.create(
+            response = await self._aclient.chat.completions.create(
                 model=engine or os.getenv("AZURE_OPENAI_LLM_ENGINE"),
                 messages=messages,
                 temperature=temperature or self.temperature,  # 值越低则输出文本随机性越低
@@ -127,7 +139,7 @@ class AzureOpenaiLLM(LLM):
             print(f"[AzureOpenaiLLM.stream] Error: {e}")
             raise
 
-    async def embed(self, input_texts: list[str] | str, engine: str = "", dimensions: int = 1536, **kwargs) -> list[list[float]]:
+    def embed(self, input_texts: list[str] | str, engine: str = "", dimensions: int = 1536, **kwargs) -> list[list[float]]:
         """
         Generate embeddings for a list of input texts.
 
@@ -139,7 +151,7 @@ class AzureOpenaiLLM(LLM):
             list[list[float]]: List of embedding vectors.
         """
         t = time.time()
-        embeddings = await self._embed_client.embeddings.create(
+        embeddings = self._embed_client.embeddings.create(
             input=input_texts,
             model=os.getenv("AZURE_OPENAI_EMBED_ENGINE") or engine,
             dimensions=dimensions,
