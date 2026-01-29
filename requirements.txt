@@ -23,7 +23,7 @@ python-dotenv>=1.0.0
 
 FlagEmbedding==1.2.11
 transformers==4.57.3
-nest_asyncio==nest-asyncio
+nest_asyncio==1.6.0
 
 # Evaluation (optional)
 # ragas>=0.1.0
