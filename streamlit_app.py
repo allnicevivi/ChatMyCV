@@ -2,6 +2,9 @@ import asyncio
 import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from backend.utils.app_logger import LoggerSetup
+
+logger = LoggerSetup("streamlit_app").logger
 
 import streamlit as st
 
@@ -142,6 +145,11 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
             )
             answer = response.get("content", "") or "[No answer received]"
+            logger.info(f"LLM answer: {answer}")
+
+            # Save assistant message to history before attempting to render
+            st.session_state["messages"].append({"role": "assistant", "content": answer})
+            
             assistant_placeholder.markdown(answer)
         except Exception as e:
             import traceback
@@ -149,7 +157,7 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
             assistant_placeholder.markdown(answer)
 
     # Save assistant message to history
-    st.session_state["messages"].append({"role": "assistant", "content": answer})
+    # st.session_state["messages"].append({"role": "assistant", "content": answer})
 
 async def main() -> None:
     st.set_page_config(
