@@ -144,11 +144,12 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
                 model=None,
             )
-            # print(f'response: {response}')
+            print(f'response: {response}')
             answer = response.get("content") or "No answer was generated."
+            print(f'answer: {answer}')
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"
-
+        
         assistant_placeholder.markdown(answer)
 
     # Save assistant message to history
