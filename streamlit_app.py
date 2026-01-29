@@ -129,7 +129,8 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
         assistant_placeholder.markdown("_Thinking..._")
 
         try:
-            response_stream = chat_service.astream_chat(  # type: ignore[attr-defined]
+            # Use non-streaming achat for Streamlit Cloud compatibility
+            response = await chat_service.achat(  # type: ignore[attr-defined]
                 lang=config["lang"],
                 query=user_input,
                 conversation_history=conversation_history,
@@ -139,19 +140,8 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
                 max_tokens=None,
                 system_prompt=config["system_prompt"],
                 character=config["character"],
-                model=None,
             )
-            # Manually iterate and update the same placeholder to avoid duplicate UI elements
-            answer = ""
-            chunk_count = 0
-            async for chunk in response_stream:
-                chunk_count += 1
-                answer += chunk
-                assistant_placeholder.markdown(answer + "▌")
-
-            # Debug: show if no chunks were received
-            if not answer:
-                answer = f"[Debug] No content received. Chunks: {chunk_count}"
+            answer = response.get("content", "") or "[No answer received]"
             assistant_placeholder.markdown(answer)
         except Exception as e:
             import traceback
@@ -171,9 +161,21 @@ async def main() -> None:
     config = render_sidebar()
     await render_chat_ui(config)
 
+def run_async(coro):
+    """Run async coroutine in a way compatible with Streamlit Cloud."""
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If there's already a running loop, create a new one
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(asyncio.run, coro)
+                return future.result()
+        else:
+            return loop.run_until_complete(coro)
+    except RuntimeError:
+        # No event loop exists, create one
+        return asyncio.run(coro)
+
 if __name__ == "__main__":
-    # Streamlit Cloud has its own event loop management
-    # Using new_event_loop() is more compatible across environments
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(main())
+    run_async(main())
