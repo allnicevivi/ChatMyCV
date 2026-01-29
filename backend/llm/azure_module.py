@@ -34,7 +34,7 @@ class AzureOpenaiLLM(LLM):
         self._client = self._create_client()
         self._embed_client = self._create_client()
         # Handle warmup in environments with or without existing event loops
-        self._run_warmup()
+        # self._run_warmup()
 
     def _run_warmup(self):
         """Run warmup safely across different async environments."""
@@ -58,7 +58,7 @@ class AzureOpenaiLLM(LLM):
                 print(f"[AzureOpenaiLLM] Warmup skipped: no event loop available")
 
     def _create_client(self) -> AsyncAzureOpenAI:
-        
+
         client = AsyncAzureOpenAI(
             api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             azure_endpoint=os.getenv("AZURE_OPENAI_API_BASE"),

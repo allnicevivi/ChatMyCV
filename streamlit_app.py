@@ -12,7 +12,13 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
 
 from backend.services.chat_serv import ChatService  # type: ignore  # noqa: E402
-chat_service = ChatService()
+
+@st.cache_resource
+def get_chat_service():
+    """Create ChatService once and reuse across reruns."""
+    return ChatService()
+
+chat_service = get_chat_service()
 
 def init_session_state() -> None:
     """Initialize Streamlit session state keys."""
@@ -137,12 +143,19 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
             )
             # Manually iterate and update the same placeholder to avoid duplicate UI elements
             answer = ""
+            chunk_count = 0
             async for chunk in response_stream:
+                chunk_count += 1
                 answer += chunk
                 assistant_placeholder.markdown(answer + "▌")
+
+            # Debug: show if no chunks were received
+            if not answer:
+                answer = f"[Debug] No content received. Chunks: {chunk_count}"
             assistant_placeholder.markdown(answer)
         except Exception as e:
-            answer = f"Error calling backend chat service: {e}"
+            import traceback
+            answer = f"Error: {e}\n\n{traceback.format_exc()}"
             assistant_placeholder.markdown(answer)
 
     # Save assistant message to history
