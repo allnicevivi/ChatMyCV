@@ -227,7 +227,11 @@ class ChatService:
             logger.info(f"LLM Raw Response Content: {response_content}")
             
             match = re.search(r'<answer>(.*?)</answer>', response_content, re.DOTALL)
-            final_answer = match.group(1).strip() if match else None
+            if match:
+                final_answer = match.group(1).strip()
+            else:
+                # If no <answer> tags are found, assume the whole response is the answer.
+                final_answer = response_content.strip()
             
             if session_id and final_answer:
                 self._conversation_store.append(session_id, query, final_answer)
