@@ -274,7 +274,12 @@ class ChatService:
             start_tag_checked = False  # Whether we've determined if <answer> exists
             is_answer_ended = False
 
+            logger.info("Starting LLM stream...")
+            chunk_count = 0
             async for chunk in self.llm.stream(messages=messages):
+                chunk_count += 1
+                if chunk_count <= 3:
+                    logger.info(f"Received chunk {chunk_count}: {chunk[:50] if chunk else 'empty'}...")
                 if is_answer_ended:
                     continue
 
@@ -316,6 +321,8 @@ class ChatService:
             if not is_answer_ended and buffer:
                 yield buffer
                 final_answer += buffer
+
+            logger.info(f"LLM stream completed. Total chunks: {chunk_count}, final_answer length: {len(final_answer)}")
 
             if session_id and final_answer:
                 self._conversation_store.append(session_id, query, final_answer)

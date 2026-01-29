@@ -104,20 +104,28 @@ class AzureOpenaiLLM(LLM):
             if prompt:
                 messages.append({"role": "user", "content": prompt})
 
-        response = await self._client.chat.completions.create(
-            model=engine or os.getenv("AZURE_OPENAI_LLM_ENGINE"),
-            messages=messages,
-            temperature=temperature or self.temperature,  # 值越低则输出文本随机性越低
-            max_tokens=self.max_tokens,
-            stream=True,
-        )
+        print(f"[AzureOpenaiLLM.stream] Starting API call...")
+        try:
+            response = await self._client.chat.completions.create(
+                model=engine or os.getenv("AZURE_OPENAI_LLM_ENGINE"),
+                messages=messages,
+                temperature=temperature or self.temperature,  # 值越低则输出文本随机性越低
+                max_tokens=self.max_tokens,
+                stream=True,
+            )
+            print(f"[AzureOpenaiLLM.stream] API call successful, starting to iterate chunks...")
 
-        async for chunk in response:
-            if not chunk.choices:
-                continue
-            content = chunk.choices[0].delta.content or ""
-            if content:
-                yield content
+            async for chunk in response:
+                if not chunk.choices:
+                    continue
+                content = chunk.choices[0].delta.content or ""
+                if content:
+                    yield content
+
+            print(f"[AzureOpenaiLLM.stream] Stream completed.")
+        except Exception as e:
+            print(f"[AzureOpenaiLLM.stream] Error: {e}")
+            raise
 
     async def embed(self, input_texts: list[str] | str, engine: str = "", dimensions: int = 1536, **kwargs) -> list[list[float]]:
         """
