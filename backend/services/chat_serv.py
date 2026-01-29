@@ -224,6 +224,7 @@ class ChatService:
             }
             response = await self.llm.chat(messages=messages, **llm_kwargs)
             response_content = response.get("content", "")
+            logger.info(f"LLM Raw Response Content: {response_content}")
             
             match = re.search(r'<answer>(.*?)</answer>', response_content, re.DOTALL)
             final_answer = match.group(1).strip() if match else None
