@@ -112,30 +112,27 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
     if not user_input:
         return
 
-    # --- This block runs only when a new user input is provided ---
-
-    # 1. Append user message to state and display it
+    # Append user message to UI history
     st.session_state["messages"].append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.markdown(user_input)
 
-    # 2. Get assistant response
+    # Determine or create session_id using the backend's session handling
+    session_id = chat_service.get_or_create_session_id(  # type: ignore[attr-defined]
+        session_id=st.session_state.get("session_id"),
+        timeout_seconds=180,
+    )
+    st.session_state["session_id"] = session_id
+
+    # Prepare conversation history for the backend (all prior messages)
+    conversation_history: List[Dict[str, str]] = st.session_state["messages"][:-1]
+
     with st.chat_message("assistant"):
         assistant_placeholder = st.empty()
         assistant_placeholder.markdown("_Thinking..._")
-        
-        # Determine session_id
-        session_id = chat_service.get_or_create_session_id(
-            session_id=st.session_state.get("session_id"),
-            timeout_seconds=180,
-        )
-        st.session_state["session_id"] = session_id
-        
-        # Prepare conversation history for the backend
-        conversation_history: List[Dict[str, str]] = st.session_state["messages"][:-1]
 
         try:
-            response = await chat_service.achat(
+            response = await chat_service.achat(  # type: ignore[attr-defined]
                 lang=config["lang"],
                 query=user_input,
                 conversation_history=conversation_history,
@@ -145,19 +142,17 @@ async def render_chat_ui(config: Dict[str, Any]) -> None:
                 max_tokens=None,
                 system_prompt=config["system_prompt"],
                 character=config["character"],
+                model=None,
             )
-            answer = response.get("content", "") or "Sorry, I received an empty response."
+            # print(f'response: {response}')
+            answer = response.get("content") or "No answer was generated."
         except Exception as e:
-            import traceback
-            answer = f"Sorry, an error occurred: {e}\n\n{traceback.format_exc()}"
-        
+            answer = f"Error calling backend chat service: {e}"
+
         assistant_placeholder.markdown(answer)
 
-    # 3. Append assistant message to state
+    # Save assistant message to history
     st.session_state["messages"].append({"role": "assistant", "content": answer})
-
-    # 4. Rerun the script to clear the input box and finalize the state
-    st.rerun()
 
 async def main() -> None:
     st.set_page_config(
@@ -180,3 +175,92 @@ def run_async(coro):
 
 if __name__ == "__main__":
     run_async(main())
+
+
+
+# async def render_chat_ui(config: Dict[str, Any]) -> None:
+#     """Render the main chat interface."""
+#     st.title("ChatMyCV")
+#     st.write(
+#         "I invite you to explore and get to know my professional journey better. "
+#         "Leverage the power of our Streamlit interface to chat with my CV/resume and uncover more about my experiences and abilities."
+#     )
+
+#     # Show existing messages
+#     for msg in st.session_state["messages"]:
+#         with st.chat_message(msg["role"]):
+#             st.markdown(msg["content"])
+
+#     # Chat input
+#     user_input = st.chat_input("Ask the candidate about their experience...")
+#     if not user_input:
+#         return
+
+#     # --- This block runs only when a new user input is provided ---
+
+#     # 1. Append user message to state and display it
+#     st.session_state["messages"].append({"role": "user", "content": user_input})
+#     with st.chat_message("user"):
+#         st.markdown(user_input)
+
+#     # 2. Get assistant response
+#     with st.chat_message("assistant"):
+#         assistant_placeholder = st.empty()
+#         assistant_placeholder.markdown("_Thinking..._")
+        
+#         # Determine session_id
+#         session_id = chat_service.get_or_create_session_id(
+#             session_id=st.session_state.get("session_id"),
+#             timeout_seconds=180,
+#         )
+#         st.session_state["session_id"] = session_id
+        
+#         # Prepare conversation history for the backend
+#         conversation_history: List[Dict[str, str]] = st.session_state["messages"][:-1]
+
+#         try:
+#             response = await chat_service.achat(
+#                 lang=config["lang"],
+#                 query=user_input,
+#                 conversation_history=conversation_history,
+#                 session_id=session_id,
+#                 k=5,
+#                 temperature=0.7,
+#                 max_tokens=None,
+#                 system_prompt=config["system_prompt"],
+#                 character=config["character"],
+#             )
+#             answer = response.get("content", "") or "Sorry, I received an empty response."
+#         except Exception as e:
+#             import traceback
+#             answer = f"Sorry, an error occurred: {e}\n\n{traceback.format_exc()}"
+        
+#         assistant_placeholder.markdown(answer)
+
+#     # 3. Append assistant message to state
+#     st.session_state["messages"].append({"role": "assistant", "content": answer})
+
+#     # 4. Rerun the script to clear the input box and finalize the state
+#     st.rerun()
+
+# async def main() -> None:
+#     st.set_page_config(
+#         page_title="ChatMyCV - Streamlit",
+#         layout="wide",
+#     )
+
+#     init_session_state()
+#     config = render_sidebar()
+#     await render_chat_ui(config)
+
+# def run_async(coro):
+#     """Run async coroutine in a way compatible with Streamlit Cloud."""
+#     loop = asyncio.new_event_loop()
+#     asyncio.set_event_loop(loop)
+#     try:
+#         return loop.run_until_complete(coro)
+#     finally:
+#         loop.close()
+
+# if __name__ == "__main__":
+#     run_async(main())

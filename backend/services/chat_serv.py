@@ -225,13 +225,12 @@ class ChatService:
             response = await self.llm.chat(messages=messages, **llm_kwargs)
             response_content = response.get("content", "")
             logger.info(f"LLM Raw Response Content: {response_content}")
-            
-            match = re.search(r'<answer>(.*?)</answer>', response_content, re.DOTALL)
-            if match:
-                final_answer = match.group(1).strip()
-            else:
-                # If no <answer> tags are found, assume the whole response is the answer.
-                final_answer = response_content.strip()
+
+            content_after_answer = re.search(r'<answer>(.*)', response_content, re.DOTALL)
+            response_content = content_after_answer.group(1).strip() if content_after_answer else response_content
+
+            content_before_answer = re.search(r'(.*)</answer>', response_content, re.DOTALL)
+            final_answer = content_before_answer.group(1).strip() if content_before_answer else response_content
             
             if session_id and final_answer:
                 self._conversation_store.append(session_id, query, final_answer)
