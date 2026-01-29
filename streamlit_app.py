@@ -163,19 +163,12 @@ async def main() -> None:
 
 def run_async(coro):
     """Run async coroutine in a way compatible with Streamlit Cloud."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
-            # If there's already a running loop, create a new one
-            import concurrent.futures
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                future = executor.submit(asyncio.run, coro)
-                return future.result()
-        else:
-            return loop.run_until_complete(coro)
-    except RuntimeError:
-        # No event loop exists, create one
-        return asyncio.run(coro)
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
 
 if __name__ == "__main__":
     run_async(main())

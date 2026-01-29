@@ -217,7 +217,12 @@ class ChatService:
                 lang=self.lang
             )
 
-            response = await self.llm.chat(messages=messages, **kwargs)
+            # Only pass relevant kwargs to llm.chat()
+            llm_kwargs = {
+                k: v for k, v in kwargs.items()
+                if k in ("temperature", "max_tokens", "engine")
+            }
+            response = await self.llm.chat(messages=messages, **llm_kwargs)
             response_content = response.get("content", "")
             
             match = re.search(r'<answer>(.*?)</answer>', response_content, re.DOTALL)
