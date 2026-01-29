@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -10,12 +11,13 @@ BACKEND_DIR = ROOT_DIR / "backend"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
 
-from backend.services import chat_service  # type: ignore  # noqa: E402
+from backend.services.chat_serv import ChatService  # type: ignore  # noqa: E402
+chat_service = ChatService()
 
 def init_session_state() -> None:
     """Initialize Streamlit session state keys."""
     if "messages" not in st.session_state:
-        st.session_state["messages"]: List[Dict[str, str]] = []
+        st.session_state["messages"]: List[Dict[str, Any]] = []
     if "session_id" not in st.session_state:
         st.session_state["session_id"]: Optional[str] = None
     if "last_character" not in st.session_state:
@@ -83,7 +85,7 @@ def render_sidebar() -> Dict[str, Any]:
         # "system_prompt": system_prompt or None,
     }
 
-def render_chat_ui(config: Dict[str, Any]) -> None:
+async def render_chat_ui(config: Dict[str, Any]) -> None:
     """Render the main chat interface."""
     st.title("ChatMyCV")
     st.write(
@@ -121,7 +123,7 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
         assistant_placeholder.markdown("_Thinking..._")
 
         try:
-            response = chat_service.chat(  # type: ignore[attr-defined]
+            response_stream = chat_service.astream_chat(  # type: ignore[attr-defined]
                 lang=config["lang"],
                 query=user_input,
                 conversation_history=conversation_history,
@@ -133,17 +135,20 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
                 model=None,
             )
-            # print(f'response: {response}')
-            answer = response.get("content") or "No answer was generated."
+            # Manually iterate and update the same placeholder to avoid duplicate UI elements
+            answer = ""
+            async for chunk in response_stream:
+                answer += chunk
+                assistant_placeholder.markdown(answer + "▌")
+            assistant_placeholder.markdown(answer)
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"
-
-        assistant_placeholder.markdown(answer)
+            assistant_placeholder.markdown(answer)
 
     # Save assistant message to history
     st.session_state["messages"].append({"role": "assistant", "content": answer})
 
-def main() -> None:
+async def main() -> None:
     st.set_page_config(
         page_title="ChatMyCV - Streamlit",
         layout="wide",
@@ -151,7 +156,7 @@ def main() -> None:
 
     init_session_state()
     config = render_sidebar()
-    render_chat_ui(config)
+    await render_chat_ui(config)
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

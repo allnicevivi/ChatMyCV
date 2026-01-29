@@ -6,10 +6,11 @@ sys.path.append("./")
 sys.path.append("../")
 
 from pathlib import Path
+import asyncio
 
 from backend.component.base import Node
-from modules import azure_client
-from vectorstores.chroma_vectordb import ChromaUsage
+from backend.llm import azure_client
+from db.chroma_vectordb import ChromaUsage
 from parsers import MarkdownReader
 from utils.app_logger import LoggerSetup
 
@@ -21,15 +22,15 @@ class DocProcessor:
         self.chroma_usage = ChromaUsage(collection_name=f"chat_cv_{lang}")
 
     
-    def parse_doc(self, file_path):
+    def parse_doc(self, file_path: Path):
         return MarkdownReader().load_data(file=file_path)
     
-    def store_doc(self, nodes: list[Node], file_path):
+    def store_doc(self, nodes: list[Node], file_path: Path):
 
         # Example texts, metadatas, embeddings
         texts = [n.text for n in nodes]
         metadatas = [n.metadata for n in nodes]
-        embeddings = azure_client.get_embeddings(texts)
+        dense_embeddings = asyncio.run(azure_client.embed(texts))
 
         # Ensuring or creating a collection
         node_cnt_before = len(self.chroma_usage.get_existing_ids())
@@ -37,7 +38,7 @@ class DocProcessor:
         self.chroma_usage.add_data_to_collection(
             texts=texts,
             metadatas=metadatas,
-            embeddings=embeddings,
+            embeddings=dense_embeddings,
             node_id_prefix=file_path.name
         )
 
@@ -48,6 +49,7 @@ class DocProcessor:
     def run(self, file_paths: list[str]|list[Path]):
         
         for file_path in file_paths:
+            file_path = Path(file_path)
             nodes = self.parse_doc(file_path)
             self.store_doc(nodes, file_path)
 
