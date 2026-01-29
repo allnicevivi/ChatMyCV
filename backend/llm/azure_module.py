@@ -10,9 +10,11 @@ import asyncio
 
 # nest_asyncio is needed for running async code in environments with existing event loops
 # but fails on Streamlit Cloud's event loop type, so we handle it gracefully
+_nest_asyncio_applied = False
 try:
     import nest_asyncio
     nest_asyncio.apply()
+    _nest_asyncio_applied = True
 except (ValueError, RuntimeError):
     # Streamlit Cloud has its own event loop management
     pass
@@ -28,13 +30,28 @@ class AzureOpenaiLLM(LLM):
         self._client = self._create_client()
         self._embed_client = self._create_client()
         # Handle warmup in environments with or without existing event loops
+        self._run_warmup()
+
+    def _run_warmup(self):
+        """Run warmup safely across different async environments."""
         try:
             loop = asyncio.get_running_loop()
-            # Already in an async context (e.g., Streamlit), schedule the warmup
+            # Already in an async context, schedule the warmup as a task
             loop.create_task(self._warmup_embed_and_chat())
         except RuntimeError:
-            # No running event loop, safe to use asyncio.run()
-            asyncio.run(self._warmup_embed_and_chat())
+            # No running event loop
+            if _nest_asyncio_applied:
+                # nest_asyncio is working, safe to use asyncio.run()
+                asyncio.run(self._warmup_embed_and_chat())
+            else:
+                # Streamlit Cloud or similar - create a new loop manually
+                try:
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    loop.run_until_complete(self._warmup_embed_and_chat())
+                except Exception as e:
+                    # Skip warmup if all else fails - it's not critical
+                    print(f"[AzureOpenaiLLM] Warmup skipped: {e}")
 
     def _create_client(self) -> AsyncAzureOpenAI:
         # http_client = httpx.AsyncClient(                                                                                                                     
@@ -151,10 +168,6 @@ if __name__ == "__main__":
     queries = [
         'Where is the body wash',
         'Where is body wash',
-        "我剛過試用期，會有特休嗎？",
-        "婚假可以請幾天？",
-        "職災有什麼補償？",
-        "工作5年特休幾天？",
     ]
     for query in queries:
         embedding = asyncio.run(azure_client.embed(input_texts=query))
