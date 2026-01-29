@@ -38,6 +38,12 @@ class AzureOpenaiLLM(LLM):
 
     def _run_warmup(self):
         """Run warmup safely across different async environments."""
+        # Skip warmup on Streamlit Cloud - it causes event loop conflicts
+        # because the client binds to one loop during warmup but uses another at runtime
+        if _is_streamlit_cloud:
+            print("[AzureOpenaiLLM] Warmup skipped on Streamlit Cloud")
+            return
+
         try:
             loop = asyncio.get_running_loop()
             # Already in an async context, schedule the warmup as a task
@@ -48,26 +54,15 @@ class AzureOpenaiLLM(LLM):
                 # nest_asyncio is working, safe to use asyncio.run()
                 asyncio.run(self._warmup_embed_and_chat())
             else:
-                # Streamlit Cloud or similar - create a new loop manually
-                try:
-                    loop = asyncio.new_event_loop()
-                    asyncio.set_event_loop(loop)
-                    loop.run_until_complete(self._warmup_embed_and_chat())
-                except Exception as e:
-                    # Skip warmup if all else fails - it's not critical
-                    print(f"[AzureOpenaiLLM] Warmup skipped: {e}")
+                # Skip warmup if no safe way to run it
+                print(f"[AzureOpenaiLLM] Warmup skipped: no event loop available")
 
     def _create_client(self) -> AsyncAzureOpenAI:
-        # http_client = httpx.AsyncClient(                                                                                                                     
-        #     timeout=httpx.Timeout(60.0, connect=10.0),                                                                                                       
-        #     limits=httpx.Limits(keepalive_expiry=300)  # 5 分鐘                                                                                              
-        # )  
-
+        
         client = AsyncAzureOpenAI(
             api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
             azure_endpoint=os.getenv("AZURE_OPENAI_API_BASE"),
             api_key=os.getenv("AZURE_OPENAI_API_KEY"),
-            # http_client=http_client
         )
 
         return client
