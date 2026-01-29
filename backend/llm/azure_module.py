@@ -7,8 +7,15 @@ from openai import AzureOpenAI, AsyncAzureOpenAI
 from typing import Optional
 import httpx
 import asyncio
-import nest_asyncio
-nest_asyncio.apply()
+
+# nest_asyncio is needed for running async code in environments with existing event loops
+# but fails on Streamlit Cloud's event loop type, so we handle it gracefully
+try:
+    import nest_asyncio
+    nest_asyncio.apply()
+except (ValueError, RuntimeError):
+    # Streamlit Cloud has its own event loop management
+    pass
 
 import os
 import time
@@ -18,9 +25,16 @@ load_dotenv()
 class AzureOpenaiLLM(LLM):
     def __init__(self, temperature: float = 0.7, max_tokens: Optional[int] = None, timeout: Optional[int] = None, provider: Optional[str] = None, **kwargs):
         super().__init__(temperature, max_tokens, timeout, provider, **kwargs)
-        self._client = self._create_client()                                                                                                             
+        self._client = self._create_client()
         self._embed_client = self._create_client()
-        asyncio.run(self._warmup_embed_and_chat())
+        # Handle warmup in environments with or without existing event loops
+        try:
+            loop = asyncio.get_running_loop()
+            # Already in an async context (e.g., Streamlit), schedule the warmup
+            loop.create_task(self._warmup_embed_and_chat())
+        except RuntimeError:
+            # No running event loop, safe to use asyncio.run()
+            asyncio.run(self._warmup_embed_and_chat())
 
     def _create_client(self) -> AsyncAzureOpenAI:
         # http_client = httpx.AsyncClient(                                                                                                                     

@@ -269,27 +269,32 @@ class ChatService:
                 lang=self.lang
             )
 
-            buffer, final_answer, is_answer_started, is_answer_ended = "", "", False, False
+            buffer = ""
+            final_answer = ""
+            start_tag_checked = False  # Whether we've determined if <answer> exists
+            is_answer_ended = False
 
             async for chunk in self.llm.stream(messages=messages):
-                # Skip processing if we've already found </answer>
                 if is_answer_ended:
                     continue
 
                 buffer += chunk
 
-                if not is_answer_started:
+                # Phase 1: Determine if <answer> tag exists
+                if not start_tag_checked:
                     start_match = re.search(r'<answer>', buffer)
                     if start_match:
-                        is_answer_started = True
+                        start_tag_checked = True
+                        # Skip <answer> tag, discard content before it
                         buffer = buffer[start_match.end():]
+                    elif len(buffer) > 8:
+                        # No <answer> tag found after sufficient content, output directly
+                        start_tag_checked = True
                     else:
-                        # Keep potential incomplete tag in buffer (len('<answer>') = 8)
-                        if len(buffer) > 8:
-                            buffer = buffer[-8:]
+                        # Not enough content to determine yet
                         continue
 
-                # Once answer started, look for </answer>
+                # Phase 2: Output content while checking for </answer>
                 end_match = re.search(r'</answer>', buffer)
                 if end_match:
                     content = buffer[:end_match.start()]
@@ -298,13 +303,18 @@ class ChatService:
                         final_answer += content
                     is_answer_ended = True
                 else:
-                    # Output content that's safe (keep last 9 chars for potential '</answer>')
+                    # Keep last 9 chars for potential incomplete '</answer>'
                     safe_length = len(buffer) - 9
                     if safe_length > 0:
                         content = buffer[:safe_length]
                         yield content
                         final_answer += content
                         buffer = buffer[safe_length:]
+
+            # Output remaining buffer if no </answer> was found
+            if not is_answer_ended and buffer:
+                yield buffer
+                final_answer += buffer
 
             if session_id and final_answer:
                 self._conversation_store.append(session_id, query, final_answer)
