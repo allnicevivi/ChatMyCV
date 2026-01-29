@@ -70,6 +70,7 @@ class ChatService:
             return session_id
         
         last_session_id, last_activity_time = self._conversation_store.get_last_session()
+        logger.info(f'last_session_id: {last_session_id}, last_activity_time: {last_activity_time}')
         
         if last_session_id is None:
             return str(uuid.uuid4())
@@ -390,8 +391,8 @@ class _ConversationStore:
             if not self._sessions:
                 return None, 0.0
             
-            most_recent_id, most_recent_time = max(self._sessions.items(), key=lambda item: item[1].get("last_activity", 0.0))
-            return most_recent_id, most_recent_time
+            most_recent_id, most_recent_activity = max(self._sessions.items(), key=lambda item: item[1].get("last_activity", 0.0))
+            return most_recent_id, most_recent_activity["last_activity"]
 
 
 if __name__ == "__main__":
