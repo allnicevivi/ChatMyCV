@@ -14,14 +14,7 @@ BACKEND_DIR = ROOT_DIR / "backend"
 if str(BACKEND_DIR) not in sys.path:
     sys.path.append(str(BACKEND_DIR))
 
-from backend.services.chat_serv import ChatService  # type: ignore  # noqa: E402
-
-@st.cache_resource
-def get_chat_service():
-    """Create ChatService once and reuse across reruns."""
-    return ChatService()
-
-chat_service = get_chat_service()
+from backend.services import chat_service  # type: ignore  # noqa: E402
 
 def init_session_state() -> None:
     """Initialize Streamlit session state keys."""
