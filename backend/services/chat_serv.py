@@ -282,6 +282,7 @@ class ChatService:
 
                 # Phase 1: Determine if <answer> tag exists
                 if not start_tag_checked:
+                    print(buffer)
                     start_match = re.search(r'<answer>', buffer)
                     if start_match:
                         start_tag_checked = True

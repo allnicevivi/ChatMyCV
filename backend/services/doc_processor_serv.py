@@ -8,8 +8,8 @@ sys.path.append("../")
 from pathlib import Path
 import asyncio
 
-from backend.component.base import Node
-from backend.llm import azure_client
+from component.base import Node
+from llm import azure_client
 from db.chroma_vectordb import ChromaUsage
 from parsers import MarkdownReader
 from utils.app_logger import LoggerSetup
