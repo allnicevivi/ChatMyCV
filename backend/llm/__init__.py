@@ -7,7 +7,7 @@ from .base import LLM
 from .azure_module import AzureOpenaiLLM
 from .openai_module import OpenAILLM
 from .claude_module import ClaudeLLM
-from .gemini_module import GeminiLLM
+# from .gemini_module import GeminiLLM
 
 load_dotenv()
 
@@ -16,14 +16,14 @@ LLM_PROVIDERS = {
     "azure": AzureOpenaiLLM,
     "openai": OpenAILLM,
     "claude": ClaudeLLM,
-    "gemini": GeminiLLM,
+    # "gemini": GeminiLLM,
 }
 
 # Providers that support embedding
 EMBED_PROVIDERS = {
     "azure": AzureOpenaiLLM,
     "openai": OpenAILLM,
-    "gemini": GeminiLLM,
+    # "gemini": GeminiLLM,
 }
 
 
