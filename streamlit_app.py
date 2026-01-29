@@ -171,7 +171,7 @@ def run_async(coro):
         return loop.run_until_complete(coro)
     finally:
         loop.close()
-
+        
 if __name__ == "__main__":
-    run_async(main())
+    asyncio.run(main())
 
