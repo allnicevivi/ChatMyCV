@@ -236,7 +236,6 @@ class ChatService:
             if session_id and final_answer:
                 self._conversation_store.append(session_id, query, final_answer)
 
-            logger.info(f"Final answer being returned: '{final_answer}'")
             return {
                 "content": final_answer,
                 "usage": response.get("usage", {}),
