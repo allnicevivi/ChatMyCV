@@ -1,3 +1,4 @@
+import asyncio
 import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
@@ -111,8 +112,10 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
     if not user_input:
         return
 
-    # Append user message to UI history FIRST
+    # Append user message to UI history
     st.session_state["messages"].append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
 
     # Determine or create session_id using the backend's session handling
     session_id = chat_service.get_or_create_session_id(  # type: ignore[attr-defined]
@@ -121,11 +124,13 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
     )
     st.session_state["session_id"] = session_id
 
-    # Prepare conversation history for the backend (all prior messages except current)
+    # Prepare conversation history for the backend (all prior messages)
     conversation_history: List[Dict[str, str]] = st.session_state["messages"][:-1]
 
-    # Call API and save response to session state BEFORE displaying
-    with st.spinner("_Thinking..._"):
+    with st.chat_message("assistant"):
+        assistant_placeholder = st.empty()
+        assistant_placeholder.markdown("_Thinking..._")
+
         try:
             response = chat_service.chat(  # type: ignore[attr-defined]
                 lang=config["lang"],
@@ -142,12 +147,11 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
             answer = response.get("content") or "No answer was generated."
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"
+        
+        assistant_placeholder.markdown(answer)
 
-    # Save assistant message to history IMMEDIATELY after getting response
+    # Save assistant message to history
     st.session_state["messages"].append({"role": "assistant", "content": answer})
-
-    # Force rerun to display the new messages properly
-    st.rerun()
 
 def main() -> None:
     st.set_page_config(
@@ -158,6 +162,15 @@ def main() -> None:
     init_session_state()
     config = render_sidebar()
     render_chat_ui(config)
+
+def run_async(coro):
+    """Run async coroutine in a way compatible with Streamlit Cloud."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
 
 if __name__ == "__main__":
     main()
