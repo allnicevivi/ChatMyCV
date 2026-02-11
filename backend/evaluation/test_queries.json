@@ -1,0 +1,301 @@
+{
+  "description": "Test queries for all agent types and HITL scenarios",
+  "test_suites": {
+    "rag_queries": {
+      "description": "Document-based queries that should route to RAG agent",
+      "lang": "en",
+      "queries": [
+        {
+          "query": "What is the candidate's work experience?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Standard RAG query about experience"
+        },
+        {
+          "query": "Tell me about the candidate's technical skills",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "RAG query about skills"
+        },
+        {
+          "query": "What programming languages does the candidate know?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Specific skills query"
+        },
+        {
+          "query": "Where did the candidate study?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Education background query"
+        },
+        {
+          "query": "What projects has the candidate worked on?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Project experience query"
+        }
+      ]
+    },
+    "chat_queries": {
+      "description": "Greetings and casual conversation that should route to Chat agent",
+      "lang": "en",
+      "queries": [
+        {
+          "query": "Hello",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Simple greeting"
+        },
+        {
+          "query": "Hi there",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Casual greeting"
+        },
+        {
+          "query": "Thank you",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Gratitude expression"
+        },
+        {
+          "query": "Goodbye",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Farewell"
+        },
+        {
+          "query": "Good morning",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Time-specific greeting"
+        }
+      ]
+    },
+    "memory_queries": {
+      "description": "Questions about previous conversation that should route to Memory agent",
+      "lang": "en",
+      "requires_session": true,
+      "queries": [
+        {
+          "query": "What did I just ask?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "Direct reference to previous question"
+        },
+        {
+          "query": "What did we discuss earlier?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "Earlier conversation reference"
+        },
+        {
+          "query": "Can you remind me what you said before?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "Reminder request"
+        },
+        {
+          "query": "What was my previous question?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "Previous question inquiry"
+        }
+      ]
+    },
+    "hitl_triggers_low_confidence": {
+      "description": "Queries that should trigger HITL due to low similarity/relevance",
+      "lang": "en",
+      "queries": [
+        {
+          "query": "What is the weather like today?",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Off-topic query - no relevant context in CV"
+        },
+        {
+          "query": "Can you help me with cooking recipes?",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Completely unrelated to CV content"
+        },
+        {
+          "query": "Tell me about quantum physics theories",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Unrelated technical topic"
+        }
+      ]
+    },
+    "hitl_triggers_risky_keywords": {
+      "description": "Queries with sensitive keywords that should trigger HITL",
+      "lang": "en",
+      "queries": [
+        {
+          "query": "What is the legal liability of the candidate's previous work?",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Contains risky keywords: legal, liability"
+        },
+        {
+          "query": "Tell me about any contract disputes or claims",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Contains risky keywords: contract, disputes, claims"
+        },
+        {
+          "query": "What confidential information can you share?",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Contains risky keyword: confidential"
+        }
+      ]
+    },
+    "rag_queries_zhtw": {
+      "description": "Traditional Chinese RAG queries",
+      "lang": "zhtw",
+      "queries": [
+        {
+          "query": "候選人的工作經驗是什麼?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Work experience query in Chinese"
+        },
+        {
+          "query": "請告訴我候選人的技術能力",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Technical skills query in Chinese"
+        },
+        {
+          "query": "候選人會哪些程式語言?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Programming languages query in Chinese"
+        },
+        {
+          "query": "候選人的學歷背景如何?",
+          "expected_route": "rag",
+          "expected_hitl": false,
+          "note": "Education background in Chinese"
+        }
+      ]
+    },
+    "chat_queries_zhtw": {
+      "description": "Traditional Chinese greetings and casual conversation",
+      "lang": "zhtw",
+      "queries": [
+        {
+          "query": "你好",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Hello in Chinese"
+        },
+        {
+          "query": "謝謝",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Thank you in Chinese"
+        },
+        {
+          "query": "再見",
+          "expected_route": "chat",
+          "expected_hitl": false,
+          "note": "Goodbye in Chinese"
+        }
+      ]
+    },
+    "memory_queries_zhtw": {
+      "description": "Traditional Chinese memory queries",
+      "lang": "zhtw",
+      "requires_session": true,
+      "queries": [
+        {
+          "query": "我剛剛問了什麼?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "What did I just ask in Chinese"
+        },
+        {
+          "query": "之前我們討論了什麼?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "What did we discuss earlier in Chinese"
+        },
+        {
+          "query": "你之前說過什麼?",
+          "expected_route": "memory",
+          "expected_hitl": false,
+          "note": "What did you say before in Chinese"
+        }
+      ]
+    },
+    "hitl_triggers_zhtw": {
+      "description": "Traditional Chinese HITL trigger queries",
+      "lang": "zhtw",
+      "queries": [
+        {
+          "query": "候選人的法律責任是什麼?",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Legal liability query in Chinese - risky keywords"
+        },
+        {
+          "query": "有關理賠和條款的資訊",
+          "expected_route": "rag",
+          "expected_hitl": true,
+          "note": "Claims and policy query - risky keywords"
+        }
+      ]
+    }
+  },
+  "manual_test_checklist": [
+    "[ ] Start all services with docker-compose up -d",
+    "[ ] Verify Langfuse UI accessible at http://localhost:3000",
+    "[ ] Verify Redis connected via redis-cli ping",
+    "[ ] Verify PostgreSQL connected via psql",
+    "[ ] Start backend with python backend/app.py",
+    "[ ] Check /observability/health returns healthy",
+    "[ ] Send RAG query and verify trace_id returned",
+    "[ ] Check Langfuse UI shows trace with all spans",
+    "[ ] Send chat query (hello) and verify route=chat",
+    "[ ] Send two messages in same session, verify memory persists",
+    "[ ] Send memory query and verify route=memory",
+    "[ ] Trigger HITL with risky keyword, verify hitl_triggered=true",
+    "[ ] Check /hitl/pending shows pending review",
+    "[ ] Approve HITL review via /hitl/{id}/approve",
+    "[ ] Run evaluation: python backend/evaluation/run_eval.py --lang en",
+    "[ ] Verify evaluation results saved to backend/evaluation/results/",
+    "[ ] Test streaming endpoint /chat/stream",
+    "[ ] Clear session via /chat/clear",
+    "[ ] Check Redis for session data persistence",
+    "[ ] Verify PostgreSQL hitl_reviews table populated",
+    "[ ] Test with Chinese queries (lang=zhtw)",
+    "[ ] Verify all Langfuse spans show correct metadata",
+    "[ ] Check system stats via /observability/stats",
+    "[ ] Flush traces via /observability/flush"
+  ],
+  "expected_behavior": {
+    "rag_agent": {
+      "triggers": "CV-related keywords (experience, skills, education, projects)",
+      "response_includes": ["trace_id", "route=rag", "retrieved_docs_count > 0", "avg_similarity"]
+    },
+    "chat_agent": {
+      "triggers": "Greetings (hi, hello, thanks, goodbye) in short queries",
+      "response_includes": ["trace_id", "route=chat", "retrieved_docs_count=0"]
+    },
+    "memory_agent": {
+      "triggers": "References to past conversation (earlier, previously, what did I)",
+      "response_includes": ["trace_id", "route=memory", "history_length"]
+    },
+    "hitl_trigger": {
+      "conditions": [
+        "avg_similarity < 0.5",
+        "risky keywords: legal, claim, policy, liability, contract, confidential",
+        "uncertainty in response"
+      ],
+      "response_includes": ["hitl_triggered=true", "hitl_reason", "hitl_review_id"]
+    }
+  }
+}

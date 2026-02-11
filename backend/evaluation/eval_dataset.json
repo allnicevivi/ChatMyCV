@@ -1,0 +1,106 @@
+{
+  "en": [
+    {
+      "question": "What is the candidate's work experience?",
+      "expected_keywords": ["experience", "work", "company", "position", "role"],
+      "category": "experience"
+    },
+    {
+      "question": "Tell me about the candidate's educational background",
+      "expected_keywords": ["education", "degree", "university", "school", "study"],
+      "category": "education"
+    },
+    {
+      "question": "What technical skills does the candidate have?",
+      "expected_keywords": ["skill", "technology", "programming", "tool", "technical"],
+      "category": "skills"
+    },
+    {
+      "question": "What projects has the candidate worked on?",
+      "expected_keywords": ["project", "development", "built", "created", "implemented"],
+      "category": "projects"
+    },
+    {
+      "question": "What are the candidate's key achievements?",
+      "expected_keywords": ["achievement", "accomplished", "success", "improve", "result"],
+      "category": "achievements"
+    },
+    {
+      "question": "Does the candidate have any certifications?",
+      "expected_keywords": ["certificate", "certification", "qualified", "license"],
+      "category": "certifications"
+    },
+    {
+      "question": "What programming languages does the candidate know?",
+      "expected_keywords": ["language", "programming", "code", "python", "java", "javascript"],
+      "category": "skills"
+    },
+    {
+      "question": "How many years of experience does the candidate have?",
+      "expected_keywords": ["year", "experience", "time", "period", "duration"],
+      "category": "experience"
+    },
+    {
+      "question": "What are the candidate's responsibilities in their current role?",
+      "expected_keywords": ["responsibility", "role", "duty", "task", "manage"],
+      "category": "experience"
+    },
+    {
+      "question": "What is the candidate's most recent position?",
+      "expected_keywords": ["position", "role", "job", "title", "current", "recent"],
+      "category": "experience"
+    }
+  ],
+  "zhtw": [
+    {
+      "question": "候選人的工作經驗是什麼?",
+      "expected_keywords": ["經驗", "工作", "公司", "職位", "任職"],
+      "category": "experience"
+    },
+    {
+      "question": "請告訴我候選人的教育背景",
+      "expected_keywords": ["教育", "學歷", "大學", "學校", "學習"],
+      "category": "education"
+    },
+    {
+      "question": "候選人有哪些技術技能?",
+      "expected_keywords": ["技能", "技術", "程式", "工具", "專業"],
+      "category": "skills"
+    },
+    {
+      "question": "候選人參與過什麼專案?",
+      "expected_keywords": ["專案", "開發", "建立", "創建", "實作"],
+      "category": "projects"
+    },
+    {
+      "question": "候選人的主要成就有哪些?",
+      "expected_keywords": ["成就", "完成", "成功", "改善", "成果"],
+      "category": "achievements"
+    },
+    {
+      "question": "候選人有任何證書嗎?",
+      "expected_keywords": ["證書", "認證", "資格", "執照"],
+      "category": "certifications"
+    },
+    {
+      "question": "候選人會哪些程式語言?",
+      "expected_keywords": ["語言", "程式", "編程", "python", "java"],
+      "category": "skills"
+    },
+    {
+      "question": "候選人有多少年的經驗?",
+      "expected_keywords": ["年", "經驗", "時間", "期間", "資歷"],
+      "category": "experience"
+    },
+    {
+      "question": "候選人目前的職責是什麼?",
+      "expected_keywords": ["職責", "責任", "工作", "任務", "管理"],
+      "category": "experience"
+    },
+    {
+      "question": "候選人最近的職位是什麼?",
+      "expected_keywords": ["職位", "工作", "職稱", "目前", "最近"],
+      "category": "experience"
+    }
+  ]
+}

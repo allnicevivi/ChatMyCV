@@ -101,7 +101,13 @@ def chat():
             "character": character,
             "usage": response.get("usage", {}),
             "retrieved_docs_count": response.get("retrieved_docs_count", 0),
-            "context_used": response.get("context_used", False)
+            "context_used": response.get("context_used", False),
+            "trace_id": response.get("trace_id"),
+            "avg_similarity": response.get("avg_similarity", 0.0),
+            "route": response.get("route", "rag"),
+            "hitl_triggered": response.get("hitl_triggered", False),
+            "hitl_reason": response.get("hitl_reason"),
+            "hitl_review_id": response.get("hitl_review_id")
         }), 200
         
     except Exception as e:

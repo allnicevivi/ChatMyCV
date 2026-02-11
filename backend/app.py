@@ -4,6 +4,8 @@ from flask_cors import CORS
 from routes.chat_routes import chat_bp
 # from routes.uploaded_routes import upload_bp
 from routes.doc_process_routes import process_bp
+from routes.hitl_routes import hitl_bp
+from routes.observability_routes import observability_bp
 
 
 def create_app() -> Flask:
@@ -26,6 +28,8 @@ def create_app() -> Flask:
     app.register_blueprint(chat_bp, url_prefix="/chat")
     # app.register_blueprint(upload_bp, url_prefix="/upload")
     app.register_blueprint(process_bp, url_prefix="/process")
+    app.register_blueprint(hitl_bp, url_prefix="/hitl")
+    app.register_blueprint(observability_bp, url_prefix="/observability")
 
     return app
 

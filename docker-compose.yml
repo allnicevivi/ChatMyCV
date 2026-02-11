@@ -1,0 +1,133 @@
+version: '3.8'
+
+services:
+  # Langfuse PostgreSQL Database
+  langfuse-db:
+    image: postgres:15-alpine
+    container_name: chatmycv-langfuse-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: langfuse
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - langfuse-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ClickHouse for Langfuse (optional, for analytics)
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server:24-alpine
+    container_name: chatmycv-langfuse-clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: langfuse
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD: langfuse_pass
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - langfuse-clickhouse-data:/var/lib/clickhouse
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Langfuse Server
+  langfuse:
+    image: langfuse/langfuse:2
+    container_name: chatmycv-langfuse
+    restart: unless-stopped
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+      langfuse-clickhouse:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    environment:
+      # Database
+      DATABASE_URL: postgresql://langfuse:langfuse_pass@langfuse-db:5432/langfuse
+
+      # ClickHouse
+      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD: langfuse_pass
+
+      # Auth
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: langfuse-secret-change-in-production
+      SALT: langfuse-salt-change-in-production
+
+      # Initial Admin Credentials
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: pk-lf-local
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: sk-lf-local
+      LANGFUSE_INIT_ORG_ID: chatmycv-org
+      LANGFUSE_INIT_ORG_NAME: "ChatMyCV Organization"
+      LANGFUSE_INIT_PROJECT_ID: chatmycv-project
+      LANGFUSE_INIT_PROJECT_NAME: "ChatMyCV RAG System"
+      LANGFUSE_INIT_USER_EMAIL: admin@chatmycv.local
+      LANGFUSE_INIT_USER_NAME: "ChatMyCV Admin"
+      LANGFUSE_INIT_USER_PASSWORD: admin123
+
+      # Telemetry (disable for self-hosted)
+      TELEMETRY_ENABLED: false
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Redis for Session Memory
+  redis:
+    image: redis:7-alpine
+    container_name: chatmycv-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PostgreSQL for HITL
+  hitl-db:
+    image: postgres:15-alpine
+    container_name: chatmycv-hitl-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: chatmycv
+      POSTGRES_USER: chatmycv_user
+      POSTGRES_PASSWORD: chatmycv_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - hitl-db-data:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chatmycv_user -d chatmycv"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  langfuse-db-data:
+  langfuse-clickhouse-data:
+  redis-data:
+  hitl-db-data:
+
+networks:
+  default:
+    name: chatmycv-network

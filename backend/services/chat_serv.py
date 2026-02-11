@@ -15,25 +15,80 @@ from vectorstores.chroma_vectordb import ChromaUsage
 from utils.app_logger import LoggerSetup
 from . import prompter
 
+# Import Langfuse for observability
+try:
+    from observability.langfuse_client import langfuse_client
+    LANGFUSE_ENABLED = langfuse_client.is_enabled
+except ImportError:
+    langfuse_client = None
+    LANGFUSE_ENABLED = False
+
+# Import Redis memory store
+try:
+    from .memory_serv import redis_memory_store, REDIS_AVAILABLE
+    MEMORY_STORE_AVAILABLE = True
+except ImportError:
+    redis_memory_store = None
+    REDIS_AVAILABLE = False
+    MEMORY_STORE_AVAILABLE = False
+
+# Import router and agents
+try:
+    from .router import query_router
+    from .agents import rag_agent, chat_agent, memory_agent
+    ROUTER_AVAILABLE = True
+except ImportError:
+    query_router = None
+    rag_agent = None
+    chat_agent = None
+    memory_agent = None
+    ROUTER_AVAILABLE = False
+
+# Import HITL service
+try:
+    from .hitl_serv import hitl_service, POSTGRES_AVAILABLE
+    HITL_AVAILABLE = True
+except ImportError:
+    hitl_service = None
+    POSTGRES_AVAILABLE = False
+    HITL_AVAILABLE = False
+
 logger = LoggerSetup("ChatService").logger
 
 chroma_usage_en = ChromaUsage(collection_name="chat_cv_en")
 chroma_usage_zhtw = ChromaUsage(collection_name="chat_cv_zhtw")
 class ChatService:
     """Service for handling chat interactions with RAG (Retrieval Augmented Generation)."""
-    
-    def __init__(self):
+
+    def __init__(self, memory_store=None):
         self.llm_client = azure_client
         self.vectorstore = chroma_usage_en
-        self._conversation_store = _ConversationStore()
+
+        # Use Redis memory store if available, otherwise fallback to in-memory
+        if memory_store:
+            self._conversation_store = memory_store
+        elif MEMORY_STORE_AVAILABLE and redis_memory_store:
+            self._conversation_store = redis_memory_store
+            logger.info(f"Using Redis memory store (connected: {redis_memory_store.is_redis_connected})")
+        else:
+            self._conversation_store = _ConversationStore()
+            logger.warning("Using in-memory conversation store (no persistence)")
 
     def clear_history(self, session_id: str) -> bool:
         """Manually clear a single session's history. Returns True if removed."""
-        return self._conversation_store.clear(session_id)
+        # Support both Redis and in-memory interfaces
+        if hasattr(self._conversation_store, 'clear_session'):
+            return self._conversation_store.clear_session(session_id)
+        else:
+            return self._conversation_store.clear(session_id)
 
     def clear_all_histories(self) -> int:
         """Manually clear all sessions. Returns number of sessions removed."""
-        return self._conversation_store.clear_all()
+        # Support both Redis and in-memory interfaces
+        if hasattr(self._conversation_store, 'clear_all_sessions'):
+            return self._conversation_store.clear_all_sessions()
+        else:
+            return self._conversation_store.clear_all()
     
     def get_system_prompt(self, character: Optional[str] = None) -> str:
         """
@@ -263,7 +318,7 @@ class ChatService:
     ) -> Dict[str, Any]:
         """
         Process a chat query with RAG.
-        
+
         Args:
             lang: Language ("en" or "zhtw")
             query: User query text
@@ -276,9 +331,9 @@ class ChatService:
             character: Interviewer character ("hr" or "engineer") for prompt selection
             model: Model name to use (optional)
             **kwargs: Additional LLM parameters
-            
+
         Returns:
-            Dictionary with response content, usage, and retrieved context info
+            Dictionary with response content, usage, retrieved context info, and trace_id
         """
         self.lang = lang
         if self.lang == "zhtw":
@@ -286,31 +341,238 @@ class ChatService:
         elif self.lang == "en":
             self.vectorstore = chroma_usage_en
 
+        # Create Langfuse trace for this request
+        trace = None
+        trace_id = None
+        if LANGFUSE_ENABLED and langfuse_client:
+            trace = langfuse_client.create_trace(
+                name="chat_request",
+                session_id=session_id,
+                metadata={
+                    "lang": lang,
+                    "query": query,
+                    "k": k,
+                    "temperature": temperature,
+                    "character": character,
+                    "model": model
+                },
+                tags=["rag", "chat"]
+            )
+            if trace:
+                trace_id = trace.id
+
         try:
-            # Cleanup expired conversations
-            self._conversation_store.cleanup_expired()
+            # ROUTING: Determine which agent should handle this query
+            route = "rag"  # Default to RAG
+            if ROUTER_AVAILABLE and query_router:
+                # Load history for routing decision
+                routing_history = None
+                if session_id is not None:
+                    if hasattr(self._conversation_store, 'load_history'):
+                        routing_history = self._conversation_store.load_history(session_id, max_messages=10)
+                    elif hasattr(self._conversation_store, 'get_history'):
+                        routing_history = self._conversation_store.get_history(session_id)
+
+                route = query_router.route_query(query, routing_history, lang)
+                logger.info(f"Query routed to: {route}")
+
+            # Delegate to appropriate agent
+            if route == "chat" and ROUTER_AVAILABLE:
+                return chat_agent(
+                    query=query,
+                    session_id=session_id,
+                    lang=lang,
+                    trace=trace,
+                    chat_service=self
+                )
+            elif route == "memory" and ROUTER_AVAILABLE:
+                return memory_agent(
+                    query=query,
+                    session_id=session_id,
+                    lang=lang,
+                    trace=trace,
+                    chat_service=self
+                )
+
+            # If route is "rag" or router not available, continue with RAG pipeline below
+            # Add router span to trace
+            if trace and LANGFUSE_ENABLED:
+                router_span = trace.span(
+                    name="router-decision",
+                    metadata={
+                        "route": route,
+                        "router_available": ROUTER_AVAILABLE
+                    }
+                )
+                router_span.end()
+
+        except Exception as routing_error:
+            logger.warning(f"Routing failed: {routing_error}. Falling back to RAG agent.")
+            route = "rag"
+
+        # Continue with RAG pipeline (this is the RAG agent logic)
+        try:
+            # Cleanup expired conversations (only for in-memory store)
+            if hasattr(self._conversation_store, 'cleanup_expired'):
+                self._conversation_store.cleanup_expired()
+
+            # SPAN: Memory Load
+            if trace and LANGFUSE_ENABLED:
+                memory_span = trace.span(
+                    name="memory-load",
+                    metadata={"session_id": session_id}
+                )
 
             # Load persisted conversation if session_id is provided
             if session_id is not None and not conversation_history:
-                conversation_history = self._conversation_store.get_history(session_id)
+                # Support both Redis and in-memory interfaces
+                if hasattr(self._conversation_store, 'load_history'):
+                    conversation_history = self._conversation_store.load_history(session_id)
+                else:
+                    conversation_history = self._conversation_store.get_history(session_id)
+
+            if trace and LANGFUSE_ENABLED and memory_span:
+                memory_span.end(
+                    metadata={
+                        "history_length": len(conversation_history) if conversation_history else 0
+                    }
+                )
+
+            # SPAN: Vector Retrieval
+            if trace and LANGFUSE_ENABLED:
+                retrieval_span = trace.span(
+                    name="vector-retrieval",
+                    metadata={
+                        "k": k,
+                        "lang": lang
+                    }
+                )
 
             # Retrieve relevant context
             retrieval_query = self._compose_retrieval_query(query, conversation_history)
             retrieved_docs = self._retrieve_context(retrieval_query, k=k)
+
+            # Extract similarity scores
+            similarity_scores = [1.0 - distance for _, _, distance in retrieved_docs]
+            avg_similarity = sum(similarity_scores) / len(similarity_scores) if similarity_scores else 0.0
+
+            if trace and LANGFUSE_ENABLED and retrieval_span:
+                retrieval_span.end(
+                    metadata={
+                        "retrieved_count": len(retrieved_docs),
+                        "similarity_scores": similarity_scores,
+                        "avg_similarity": avg_similarity,
+                        "retrieval_query": retrieval_query[:200]  # Truncate for readability
+                    }
+                )
+
             context = self._format_context(retrieved_docs)
-            
+
             if not context:
+                if trace and LANGFUSE_ENABLED:
+                    trace.update(
+                        metadata={"error": "No context retrieved"}
+                    )
                 return {
                 "content": None,
                 "usage": None,
                 "retrieved_docs_count": 0,
-                "context_used": bool(context)
+                "context_used": bool(context),
+                "trace_id": trace_id,
+                "avg_similarity": 0.0,
+                "route": "rag"
             }
+
+            # HITL CHECK: Determine if human review is needed
+            hitl_triggered = False
+            hitl_reason = None
+            hitl_review_id = None
+
+            if HITL_AVAILABLE and hitl_service:
+                hitl_reason = hitl_service.should_trigger_hitl(
+                    similarity_score=avg_similarity,
+                    question=query,
+                    lang=lang
+                )
+
+                if hitl_reason:
+                    hitl_triggered = True
+
+                    # Save HITL request to database
+                    hitl_review_id = hitl_service.save_hitl_request(
+                        session_id=session_id or "unknown",
+                        question=query,
+                        retrieved_docs=retrieved_docs,
+                        similarity_score=avg_similarity,
+                        reason=hitl_reason,
+                        lang=lang,
+                        character=character or "hr"
+                    )
+
+                    # Add HITL span to trace
+                    if trace and LANGFUSE_ENABLED:
+                        hitl_span = trace.span(
+                            name="hitl-trigger",
+                            metadata={
+                                "triggered": True,
+                                "reason": hitl_reason,
+                                "review_id": hitl_review_id,
+                                "avg_similarity": avg_similarity
+                            }
+                        )
+                        hitl_span.end()
+
+                    # Return HITL message instead of proceeding to LLM
+                    hitl_message = (
+                        "Thank you for your question. This query requires human review for accuracy. "
+                        f"Your request has been logged (Review ID: {hitl_review_id}). "
+                        "A human expert will review and provide an answer soon."
+                    ) if lang == "en" else (
+                        "感謝您的提問。此問題需要人工審核以確保準確性。"
+                        f"您的請求已記錄(審核編號: {hitl_review_id})。"
+                        "專家將盡快審核並提供答案。"
+                    )
+
+                    logger.info(f"HITL triggered for session {session_id}: {hitl_reason}")
+
+                    # Update trace
+                    if trace and LANGFUSE_ENABLED:
+                        trace.update(
+                            output=hitl_message,
+                            metadata={
+                                "hitl_triggered": True,
+                                "hitl_reason": hitl_reason,
+                                "hitl_review_id": hitl_review_id
+                            }
+                        )
+
+                    return {
+                        "content": hitl_message,
+                        "usage": {},
+                        "retrieved_docs_count": len(retrieved_docs),
+                        "context_used": bool(context),
+                        "trace_id": trace_id,
+                        "avg_similarity": avg_similarity,
+                        "route": "rag",
+                        "hitl_triggered": True,
+                        "hitl_reason": hitl_reason,
+                        "hitl_review_id": hitl_review_id
+                    }
+
+            # SPAN: Prompt Construction
+            if trace and LANGFUSE_ENABLED:
+                prompt_span = trace.span(
+                    name="prompt-construction",
+                    metadata={
+                        "character": character,
+                        "has_system_prompt": system_prompt is not None
+                    }
+                )
 
             # Get system prompt: use provided one, or get based on character, or use default
             if system_prompt is None and character is not None:
                 system_prompt = self.get_system_prompt(character.lower())
-            
+
             # Build messages
             messages = self._build_messages(
                 user_query=query,
@@ -318,7 +580,26 @@ class ChatService:
                 conversation_history=conversation_history,
                 system_prompt=system_prompt
             )
-            
+
+            if trace and LANGFUSE_ENABLED and prompt_span:
+                prompt_span.end(
+                    metadata={
+                        "message_count": len(messages),
+                        "context_length": len(context)
+                    }
+                )
+
+            # SPAN: LLM Call
+            if trace and LANGFUSE_ENABLED:
+                llm_span = trace.span(
+                    name="llm-call",
+                    metadata={
+                        "model": model,
+                        "temperature": temperature,
+                        "max_tokens": max_tokens
+                    }
+                )
+
             # Get LLM response
             response = self.llm_client.get_chat_completion_with_usage(
                 messages=messages,
@@ -330,10 +611,18 @@ class ChatService:
             response_content = response["content"]
             logger.info(f'chat response: {response_content}')
 
+            if trace and LANGFUSE_ENABLED and llm_span:
+                llm_span.end(
+                    metadata={
+                        "usage": response.get("usage", {}),
+                        "response_length": len(response_content)
+                    }
+                )
+
             # Parse final answer
             match = re.search(r'<answer>(.*?)</answer>', response_content, re.DOTALL)
             match2 = re.search(r'<answer>(.*)', response_content, re.DOTALL)
-            
+
             if match:
                 final_answer = match.group(1).strip()
                 if final_answer in ["None", "Empty Response"]:
@@ -344,23 +633,48 @@ class ChatService:
                     final_answer = None
             else:
                 final_answer = None
-            
+
             # Persist conversation state if session_id provided
             if session_id is not None and final_answer:
-                self._conversation_store.append(
-                    session_id=session_id,
-                    user_message=query,
-                    assistant_message=final_answer,
+                # Support both Redis and in-memory interfaces
+                if hasattr(self._conversation_store, 'save_message'):
+                    # Redis interface: save user and assistant messages separately
+                    self._conversation_store.save_message(session_id, "user", query)
+                    self._conversation_store.save_message(session_id, "assistant", final_answer)
+                else:
+                    # In-memory interface: append both at once
+                    self._conversation_store.append(
+                        session_id=session_id,
+                        user_message=query,
+                        assistant_message=final_answer,
+                    )
+
+            # Finalize trace
+            if trace and LANGFUSE_ENABLED:
+                trace.update(
+                    output=final_answer,
+                    metadata={
+                        "success": True,
+                        "answer_parsed": final_answer is not None
+                    }
                 )
 
             return {
                 "content": final_answer,
                 "usage": response.get("usage", {}),
                 "retrieved_docs_count": len(retrieved_docs),
-                "context_used": bool(context)
+                "context_used": bool(context),
+                "trace_id": trace_id,
+                "avg_similarity": avg_similarity,
+                "route": "rag",  # This path is always RAG agent
+                "hitl_triggered": False  # HITL was not triggered
             }
         except Exception as e:
             logger.error(f"Error in chat service: {e}", exc_info=True)
+            if trace and LANGFUSE_ENABLED:
+                trace.update(
+                    metadata={"error": str(e), "success": False}
+                )
             raise
     
     def stream_chat(
@@ -395,12 +709,17 @@ class ChatService:
             Chunks of the generated response
         """
         try:
-            # Cleanup expired conversations
-            self._conversation_store.cleanup_expired()
+            # Cleanup expired conversations (only for in-memory store)
+            if hasattr(self._conversation_store, 'cleanup_expired'):
+                self._conversation_store.cleanup_expired()
 
             # Load persisted conversation if session_id is provided
             if session_id is not None and not conversation_history:
-                conversation_history = self._conversation_store.get_history(session_id)
+                # Support both Redis and in-memory interfaces
+                if hasattr(self._conversation_store, 'load_history'):
+                    conversation_history = self._conversation_store.load_history(session_id)
+                else:
+                    conversation_history = self._conversation_store.get_history(session_id)
 
             # Retrieve relevant context
             retrieval_query = self._compose_retrieval_query(query, conversation_history)
@@ -434,11 +753,19 @@ class ChatService:
 
             # After stream finishes, persist concatenated assistant reply
             if session_id is not None and accumulated:
-                self._conversation_store.append(
-                    session_id=session_id,
-                    user_message=query,
-                    assistant_message="".join(accumulated),
-                )
+                assistant_message = "".join(accumulated)
+                # Support both Redis and in-memory interfaces
+                if hasattr(self._conversation_store, 'save_message'):
+                    # Redis interface: save user and assistant messages separately
+                    self._conversation_store.save_message(session_id, "user", query)
+                    self._conversation_store.save_message(session_id, "assistant", assistant_message)
+                else:
+                    # In-memory interface: append both at once
+                    self._conversation_store.append(
+                        session_id=session_id,
+                        user_message=query,
+                        assistant_message=assistant_message,
+                    )
         except Exception as e:
             logger.error(f"Error in stream chat service: {e}", exc_info=True)
             raise
