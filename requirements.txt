@@ -1,6 +1,8 @@
 # Core dependencies
 openai>=1.0.0
-google-generativeai>=0.3.0
+anthropic>=0.18.0
+google-genai==1.60.0
+
 requests>=2.31.0
 
 # Web framework
@@ -8,7 +10,7 @@ flask>=3.0.0
 flask-cors>=4.0.0
 
 # UI
-streamlit>=1.37.0
+streamlit>=1.53.1
 
 # Vector store
 chromadb>=0.4.0
@@ -25,3 +27,16 @@ langfuse>=2.0.0
 redis>=5.0.0
 psycopg2-binary>=2.9.0
 
+# LLMOps & Observability
+langfuse>=2.0.0
+redis>=5.0.0
+psycopg2-binary>=2.9.0
+
+FlagEmbedding==1.2.11
+transformers==4.57.3
+# nest_asyncio==1.6.0
+
+# Evaluation (optional)
+# ragas>=0.1.0
+# datasets>=2.0.0
+# langchain-openai>=0.1.0

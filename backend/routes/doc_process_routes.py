@@ -8,7 +8,7 @@ sys.path.append("../")
 from pathlib import Path
 from flask import Blueprint, request, jsonify
 from services import DocProcessor
-from vectorstores.chroma_vectordb import ChromaUsage
+from db.chroma_vectordb import ChromaUsage
 from utils.app_logger import LoggerSetup
 
 logger = LoggerSetup("DocProcess_Rte").logger

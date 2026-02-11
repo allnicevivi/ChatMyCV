@@ -1,6 +1,10 @@
+import asyncio
 import sys
 from pathlib import Path
 from typing import List, Dict, Any, Optional
+from backend.utils.app_logger import LoggerSetup
+
+logger = LoggerSetup("streamlit_app").logger
 
 import streamlit as st
 
@@ -15,7 +19,7 @@ from backend.services import chat_service  # type: ignore  # noqa: E402
 def init_session_state() -> None:
     """Initialize Streamlit session state keys."""
     if "messages" not in st.session_state:
-        st.session_state["messages"]: List[Dict[str, str]] = []
+        st.session_state["messages"]: List[Dict[str, Any]] = []
     if "session_id" not in st.session_state:
         st.session_state["session_id"]: Optional[str] = None
     if "last_character" not in st.session_state:
@@ -133,11 +137,10 @@ def render_chat_ui(config: Dict[str, Any]) -> None:
                 character=config["character"],
                 model=None,
             )
-            # print(f'response: {response}')
             answer = response.get("content") or "No answer was generated."
         except Exception as e:
             answer = f"Error calling backend chat service: {e}"
-
+        
         assistant_placeholder.markdown(answer)
 
     # Save assistant message to history
@@ -153,5 +156,15 @@ def main() -> None:
     config = render_sidebar()
     render_chat_ui(config)
 
+def run_async(coro):
+    """Run async coroutine in a way compatible with Streamlit Cloud."""
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    try:
+        return loop.run_until_complete(coro)
+    finally:
+        loop.close()
+
 if __name__ == "__main__":
     main()
+

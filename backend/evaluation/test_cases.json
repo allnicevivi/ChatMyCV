@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "language": "en",
+    "description": "Evaluation test cases for ChatMyCV"
+  },
+  "test_cases": [
+    {
+      "id": "tc_001",
+      "question": "What is Vivi's current job title?",
+      "expected_sources": ["Work Experience"],
+      "ground_truth": "The answer should mention her current role and company.",
+      "category": "factual"
+    },
+    {
+      "id": "tc_002",
+      "question": "What programming languages does Vivi know?",
+      "expected_sources": ["Skills", "Work Experience"],
+      "ground_truth": "Should list programming languages mentioned in the CV.",
+      "category": "factual"
+    },
+    {
+      "id": "tc_003",
+      "question": "Tell me about Vivi's experience with machine learning.",
+      "expected_sources": ["Work Experience", "Projects"],
+      "ground_truth": "Should describe ML-related work experience and projects.",
+      "category": "experience"
+    },
+    {
+      "id": "tc_004",
+      "question": "Where did Vivi go to school?",
+      "expected_sources": ["Education"],
+      "ground_truth": "Should mention educational institutions and degrees.",
+      "category": "factual"
+    },
+    {
+      "id": "tc_005",
+      "question": "What leadership experience does Vivi have?",
+      "expected_sources": ["Leadership", "Work Experience"],
+      "ground_truth": "Should describe leadership roles and team management experience.",
+      "category": "experience"
+    },
+    {
+      "id": "tc_006",
+      "question": "Does Vivi have experience with blockchain?",
+      "expected_sources": [],
+      "ground_truth": "Should indicate if this information is not in the CV, or cite relevant experience if present.",
+      "category": "negative"
+    }
+  ]
+}
