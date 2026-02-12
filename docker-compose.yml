@@ -48,18 +48,18 @@ services:
     depends_on:
       langfuse-db:
         condition: service_healthy
-      langfuse-clickhouse:
-        condition: service_healthy
+      # langfuse-clickhouse:
+      #   condition: service_healthy
     ports:
       - "3000:3000"
     environment:
       # Database
       DATABASE_URL: postgresql://langfuse:langfuse_pass@langfuse-db:5432/langfuse
 
-      # ClickHouse
-      CLICKHOUSE_URL: http://langfuse-clickhouse:8123
-      CLICKHOUSE_USER: langfuse
-      CLICKHOUSE_PASSWORD: langfuse_pass
+      # ClickHouse (disabled - optional for analytics)
+      # CLICKHOUSE_URL: http://langfuse-clickhouse:8123
+      # CLICKHOUSE_USER: langfuse
+      # CLICKHOUSE_PASSWORD: langfuse_pass
 
       # Auth
       NEXTAUTH_URL: http://localhost:3000

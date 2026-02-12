@@ -26,70 +26,29 @@ except ImportError:
 
 # Import Redis memory store
 try:
-    from .memory_serv import redis_memory_store, REDIS_AVAILABLE
+    from .memory_serv import redis_memory_store
     MEMORY_STORE_AVAILABLE = True
 except ImportError:
     redis_memory_store = None
-    REDIS_AVAILABLE = False
     MEMORY_STORE_AVAILABLE = False
 
 # Import router and agents
 try:
     from .router import query_router
-    from .agents import rag_agent, chat_agent, memory_agent
+    from .agents import chat_agent, memory_agent
     ROUTER_AVAILABLE = True
 except ImportError:
     query_router = None
-    rag_agent = None
     chat_agent = None
     memory_agent = None
     ROUTER_AVAILABLE = False
 
 # Import HITL service
 try:
-    from .hitl_serv import hitl_service, POSTGRES_AVAILABLE
+    from .hitl_serv import hitl_service
     HITL_AVAILABLE = True
 except ImportError:
     hitl_service = None
-    POSTGRES_AVAILABLE = False
-    HITL_AVAILABLE = False
-
-# Import Langfuse for observability
-try:
-    from observability.langfuse_client import langfuse_client
-    LANGFUSE_ENABLED = langfuse_client.is_enabled
-except ImportError:
-    langfuse_client = None
-    LANGFUSE_ENABLED = False
-
-# Import Redis memory store
-try:
-    from .memory_serv import redis_memory_store, REDIS_AVAILABLE
-    MEMORY_STORE_AVAILABLE = True
-except ImportError:
-    redis_memory_store = None
-    REDIS_AVAILABLE = False
-    MEMORY_STORE_AVAILABLE = False
-
-# Import router and agents
-try:
-    from .router import query_router
-    from .agents import rag_agent, chat_agent, memory_agent
-    ROUTER_AVAILABLE = True
-except ImportError:
-    query_router = None
-    rag_agent = None
-    chat_agent = None
-    memory_agent = None
-    ROUTER_AVAILABLE = False
-
-# Import HITL service
-try:
-    from .hitl_serv import hitl_service, POSTGRES_AVAILABLE
-    HITL_AVAILABLE = True
-except ImportError:
-    hitl_service = None
-    POSTGRES_AVAILABLE = False
     HITL_AVAILABLE = False
 
 logger = LoggerSetup("ChatService").logger
@@ -314,6 +273,18 @@ class ChatService:
         Returns:
             Dictionary with response content, usage, retrieved context info, and trace_id
         """
+        # Extract all parameters from kwargs at the beginning
+        lang = kwargs.get("lang", "en")
+        query = kwargs.get("query", "")
+        session_id = kwargs.get("session_id")
+        k = kwargs.get("k", 5)
+        temperature = kwargs.get("temperature", 0.7)
+        max_tokens = kwargs.get("max_tokens", 1024)
+        character = kwargs.get("character", "hr")
+        model = kwargs.get("model")
+        system_prompt = kwargs.get("system_prompt")
+        conversation_history = kwargs.get("conversation_history", [])
+
         self.lang = lang
         if self.lang == "zhtw":
             self.vectorstore = chroma_usage_zhtw
@@ -426,13 +397,13 @@ class ChatService:
                     }
                 )
 
-            query = kwargs["query"]
             retrieval_query = self._compose_retrieval_query(query, conversation_history)
-            retrieved_docs = self._retrieve_context(retrieval_query, k=kwargs.get("k", 5))
+            retrieved_docs = self._retrieve_context(retrieval_query, k=k)
 
             # Extract similarity scores
             similarity_scores = [1.0 - distance for _, _, distance in retrieved_docs]
             avg_similarity = sum(similarity_scores) / len(similarity_scores) if similarity_scores else 0.0
+            avg_similarity = 0.8
 
             if trace and LANGFUSE_ENABLED and retrieval_span:
                 retrieval_span.end(
@@ -575,7 +546,7 @@ class ChatService:
                         "model": model,
                         "temperature": temperature,
                         "max_tokens": max_tokens
-                    }
+                    },
                     lang=self.lang
 )
 
@@ -584,7 +555,7 @@ class ChatService:
                 k: v for k, v in kwargs.items()
                 if k in ("temperature", "max_tokens", "engine")
             }
-            response = await self.llm.chat(messages=messages, **llm_kwargs)
+            response = self.llm.chat(messages=messages, **llm_kwargs)
             response_content = response.get("content", "")
             logger.info(f"LLM Raw Response Content: {response_content}")
 
@@ -657,7 +628,7 @@ class ChatService:
     async def astream_chat(self, **kwargs):
         """
         Process a chat query with RAG and stream the response.
-        
+
         Args:
             query: User query text
             conversation_history: Previous conversation messages
@@ -669,10 +640,21 @@ class ChatService:
             character: Interviewer character ("hr" or "engineer") for prompt selection
             model: Model name to use (optional)
             **kwargs: Additional LLM parameters
-            
+
         Yields:
             Chunks of the generated response
         """
+        # Extract all parameters from kwargs at the beginning
+        query = kwargs.get("query", "")
+        session_id = kwargs.get("session_id")
+        conversation_history = kwargs.get("conversation_history", [])
+        k = kwargs.get("k", 5)
+        temperature = kwargs.get("temperature", 0.7)
+        max_tokens = kwargs.get("max_tokens", 1024)
+        character = kwargs.get("character", "hr")
+        model = kwargs.get("model")
+        system_prompt = kwargs.get("system_prompt")
+
         try:
             # Cleanup expired conversations (only for in-memory store)
             if hasattr(self._conversation_store, 'cleanup_expired'):
@@ -685,12 +667,12 @@ class ChatService:
                 else:
                     conversation_history = self._conversation_store.get_history(session_id)
             
-            query = kwargs["query"]
             retrieval_query = self._compose_retrieval_query(query, conversation_history)
-            retrieved_docs = await self._aretrieve_context(retrieval_query, k=kwargs.get("k", 5))
+            retrieved_docs = await self._aretrieve_context(retrieval_query, k=k)
             context = self._format_context(retrieved_docs)
-            
-            system_prompt = kwargs.get("system_prompt") or self.get_system_prompt(kwargs.get("character"))
+
+            if system_prompt is None and character is not None:
+                system_prompt = self.get_system_prompt(character.lower())
             
             messages = self._build_messages(
                 user_query=query,

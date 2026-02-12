@@ -27,11 +27,6 @@ langfuse>=2.0.0
 redis>=5.0.0
 psycopg2-binary>=2.9.0
 
-# LLMOps & Observability
-langfuse>=2.0.0
-redis>=5.0.0
-psycopg2-binary>=2.9.0
-
 FlagEmbedding==1.2.11
 transformers==4.57.3
 # nest_asyncio==1.6.0
